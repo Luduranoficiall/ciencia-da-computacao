@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luduranoficiall/ciencia-da-computacao/schemas/progress.schema.json",
+  "title": "Progress tracking",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "completed"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "completed": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    }
+  }
+}

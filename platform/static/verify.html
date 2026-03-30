@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Validar certificado</title>
+    <meta name="theme-color" content="#0b1220" />
+    <link rel="stylesheet" href="/ui/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="topbar">
+        <div class="brand">Validar certificado</div>
+        <div class="actions">
+          <a class="btn ghost" href="/ui/">Voltar ao curso</a>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2>Verificação pública</h2>
+        <p class="muted small">
+          Insira o serial impresso no PDF. Não são mostrados dados pessoais — apenas se o certificado é válido e a data
+          de emissão.
+        </p>
+        <form id="verifyForm">
+          <label>
+            Serial
+            <input id="serial" name="serial" type="text" autocomplete="off" required maxlength="64" pattern="[A-Za-z0-9_-]+" />
+          </label>
+          <button class="btn primary" type="submit">Verificar</button>
+          <p id="verifyResult" class="muted" role="status" hidden></p>
+          <p id="verifyError" class="error" role="alert" hidden></p>
+        </form>
+      </section>
+    </div>
+    <script src="/ui/verify.js"></script>
+  </body>
+</html>

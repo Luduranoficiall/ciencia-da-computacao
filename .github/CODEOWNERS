@@ -1,0 +1,5 @@
+# Revisão sugerida para todo PR que altere ficheiros abrangidos.
+# 1) Troque @luduranoficiall pelo seu utilizador GitHub (ou acrescente mais @).
+# 2) Em Settings → Code owners, pode exigir aprovação de code owners (opcional).
+
+* @luduranoficiall

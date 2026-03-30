@@ -1,0 +1,344 @@
+:root {
+  --bg: #0b1220;
+  --card: #111b2e;
+  --muted: #93a4c7;
+  --text: #e8eefc;
+  --primary: #4f8cff;
+  --danger: #ff5a6a;
+  --border: rgba(255, 255, 255, 0.12);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans,
+    Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: radial-gradient(ellipse at top, #132043 0%, var(--bg) 60%);
+  color: var(--text);
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.brand {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin: 10px 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  border-color: rgba(79, 140, 255, 0.7);
+  background: rgba(79, 140, 255, 0.2);
+}
+
+.btn.ghost {
+  background: transparent;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  color: var(--danger);
+  margin-top: 10px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.9rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 14px;
+}
+
+@media (max-width: 820px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+}
+
+.moduleItem {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.moduleHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.moduleTitle {
+  font-weight: 700;
+}
+
+.moduleActions {
+  margin-top: 10px;
+}
+
+.pill {
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.moduleBody {
+  margin-top: 8px;
+  white-space: pre-wrap;
+  line-height: 1.35;
+  color: rgba(232, 238, 252, 0.92);
+}
+
+.progressWrap {
+  margin-bottom: 14px;
+}
+
+.progressMeta {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.progressTrack {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.progressFill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #4f8cff, #7ab6ff);
+  transition: width 0.25s ease;
+}
+
+.footerSep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+
+footer a {
+  color: #9db7ff;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* Landing (course_presentation.json) */
+.landing .landingTitle {
+  margin-top: 0;
+  font-size: 1.65rem;
+  letter-spacing: -0.02em;
+}
+
+.landing .tagline {
+  font-size: 1.05rem;
+  color: rgba(232, 238, 252, 0.95);
+  margin-top: 0.25rem;
+}
+
+.scopeNote {
+  margin-top: 10px;
+  line-height: 1.45;
+}
+
+.landingBlock {
+  margin-top: 22px;
+}
+
+.landingBlock h2 {
+  margin-bottom: 8px;
+  font-size: 1.15rem;
+}
+
+.profSubtitle {
+  margin: 6px 0 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.highlightGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.highlightCard {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.highlightIcon {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+}
+
+.trimesterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.trimesterCard {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.trimesterCard .hours {
+  font-weight: 700;
+  color: var(--primary);
+  margin: 4px 0 8px;
+}
+
+.discList {
+  margin: 8px 0 0;
+  padding-left: 1.2rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chip {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.partnerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.partnerCard {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.partnerCard h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.platformBlock {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  margin-top: 8px;
+}
+
+.platformGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.platformCard {
+  border: 1px solid rgba(79, 140, 255, 0.35);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(79, 140, 255, 0.06);
+}
+
+.platformCard h3 {
+  margin: 0 0 6px;
+  font-size: 0.98rem;
+}
+

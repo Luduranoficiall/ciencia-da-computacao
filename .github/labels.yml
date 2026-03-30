@@ -1,0 +1,30 @@
+# Sincronizado pelo workflow sync-labels.yml (EndBug/label-sync).
+# Cores em hex sem #. Descrições ≤ 100 caracteres (limite do GitHub).
+
+- name: correção
+  color: "0E7490"
+  description: Typos, links quebrados, formatação — alinhado ao template de issue.
+
+- name: sugestão
+  color: "7C3AED"
+  description: Ideia de conteúdo, trilha ou estrutura — alinhado ao template de issue.
+
+- name: dúvida
+  color: "64748B"
+  description: Uso da trilha ou do repositório — alinhado ao template de issue.
+
+- name: documentação
+  color: "0369A1"
+  description: README, FAQ, extras, templates — texto e navegação.
+
+- name: good first issue
+  color: "16A34A"
+  description: Boa primeira contribuição; escopo pequeno (typos, um link, um parágrafo).
+
+- name: ci
+  color: "CA8A04"
+  description: GitHub Actions, Lychee, workflows.
+
+- name: stale
+  color: "78716C"
+  description: Sem atividade recente; comente ou retire a label — não fecha só por isso.

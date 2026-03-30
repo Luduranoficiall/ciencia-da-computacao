@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luduranoficiall/ciencia-da-computacao/schemas/readme_mermaid_diagram_omit.schema.json",
+  "title": "Curriculum ids omitted from README Mermaid diagram",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ids"],
+  "properties": {
+    "description": {
+      "type": "string"
+    },
+    "ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    }
+  }
+}

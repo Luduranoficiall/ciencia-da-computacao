@@ -1,0 +1,24 @@
+{
+  "description": "Mapeia IDs curtos do diagrama Mermaid do README para IDs em curriculum.json. Obrigatorio para check_mermaid_curriculum_sync.py.",
+  "nodes": {
+    "D": "discreta",
+    "CD": "circuitos",
+    "LP": "ling_prog",
+    "P1": "prog1",
+    "ED": "ed",
+    "P2": "prog2",
+    "OO": "oo",
+    "G": "grafos",
+    "AA": "analise_alg",
+    "A1": "arq1",
+    "A2": "arq2",
+    "SO": "so",
+    "R": "redes",
+    "BD": "bd",
+    "SD": "dist",
+    "LA": "automatos",
+    "TC": "teo_comp",
+    "IA": "ia",
+    "DL": "dl"
+  }
+}

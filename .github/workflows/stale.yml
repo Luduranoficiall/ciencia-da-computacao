@@ -1,0 +1,39 @@
+# Marca issues/PRs inativos com a label `stale`. Não fecha nada automaticamente.
+# Ajuste prazos em `days-before-*-stale` se o repositório for muito ativo ou muito quieto.
+
+name: Stale
+
+on:
+  schedule:
+    - cron: "42 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-issue-stale: 120
+          days-before-pr-stale: 60
+          days-before-issue-close: -1
+          days-before-pr-close: -1
+          exempt-issue-labels: "good first issue"
+          exempt-draft-pr: true
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
+          stale-issue-message: |
+            Esta issue ficou **120 dias** sem comentários nem atualizações. Foi marcada como `stale` só para organização — **não será fechada automaticamente**.
+
+            Se o assunto ainda for relevante, comente ou remova a label `stale`. Se já estiver resolvido, pode fechar.
+          stale-pr-message: |
+            Este PR ficou **60 dias** sem atividade. Foi marcado como `stale` — **não será fechado automaticamente**.
+
+            Se ainda fizer sentido, faça push ou comente. Rascunhos (*draft*) são ignorados por este fluxo até saírem de rascunho.
+          remove-stale-when-updated: true
+          operations-per-run: 60

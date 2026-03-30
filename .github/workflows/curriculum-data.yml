@@ -1,0 +1,83 @@
+name: Curriculum data
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "data/curriculum.json"
+      - "data/course_presentation.json"
+      - "data/progress.json"
+      - "tools/validate_curriculum.py"
+      - "tools/curriculum_progress.py"
+      - "tools/curriculum_common.py"
+      - "tools/test_curriculum_validation.py"
+      - "tools/check_readme_mermaid.py"
+      - "tools/readme_mermaid_common.py"
+      - "tools/check_mermaid_curriculum_sync.py"
+      - "tools/test_readme_mermaid.py"
+      - "data/readme_mermaid_map.json"
+      - "data/readme_mermaid_diagram_omit.json"
+      - "tools/mermaid_diagram_coverage.py"
+      - "tools/test_mermaid_coverage.py"
+      - "README.md"
+      - "tools/verify_repo.sh"
+      - "tools/check_exercicios_semester.py"
+      - "tools/repo_paths.py"
+      - "tools/README.md"
+      - "docs/exercicios-por-disciplina.md"
+      - "docs/graduacao-4-anos.md"
+      - "data/schemas/**"
+      - "tools/validate_data_schemas.py"
+      - "requirements-dev.txt"
+      - "tools/resolve_python.sh"
+      - "tools/test_json_schema.py"
+      - ".pre-commit-config.yaml"
+  pull_request:
+    paths:
+      - "data/curriculum.json"
+      - "data/course_presentation.json"
+      - "data/progress.json"
+      - "tools/validate_curriculum.py"
+      - "tools/curriculum_progress.py"
+      - "tools/curriculum_common.py"
+      - "tools/test_curriculum_validation.py"
+      - "tools/check_readme_mermaid.py"
+      - "tools/readme_mermaid_common.py"
+      - "tools/check_mermaid_curriculum_sync.py"
+      - "tools/test_readme_mermaid.py"
+      - "data/readme_mermaid_map.json"
+      - "data/readme_mermaid_diagram_omit.json"
+      - "tools/mermaid_diagram_coverage.py"
+      - "tools/test_mermaid_coverage.py"
+      - "README.md"
+      - "tools/verify_repo.sh"
+      - "tools/check_exercicios_semester.py"
+      - "tools/repo_paths.py"
+      - "tools/README.md"
+      - "docs/exercicios-por-disciplina.md"
+      - "docs/graduacao-4-anos.md"
+      - "data/schemas/**"
+      - "tools/validate_data_schemas.py"
+      - "requirements-dev.txt"
+      - "tools/resolve_python.sh"
+      - "tools/test_json_schema.py"
+      - ".pre-commit-config.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Instalar dependencias (JSON Schema)
+        run: pip install -r requirements-dev.txt
+      - name: Verificacao completa (mesmo que verify_repo.sh)
+        run: bash tools/verify_repo.sh

@@ -1,0 +1,11 @@
+# Opcional: pip install pre-commit && pre-commit install
+# Corre a mesma verificacao que CI (schemas + grafo + Mermaid + testes).
+repos:
+  - repo: local
+    hooks:
+      - id: verify-repo
+        name: verify_repo (schemas + DAG + mermaid + exercicios S1-S8 + unittest)
+        language: system
+        entry: bash -c 'cd "$(git rev-parse --show-toplevel)" && bash tools/verify_repo.sh'
+        pass_filenames: false
+        files: ^(data/.*\.json|data/schemas/.*|tools/.*\.(py|sh)|README\.md|FAQ\.md|docs/exercicios-por-disciplina\.md|docs/graduacao-4-anos\.md|requirements-dev\.txt)$

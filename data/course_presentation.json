@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "title": "Ciência da Computação",
+  "tagline": "Formação em tecnologia com progresso visível, certificação e base sólida para o mercado.",
+  "scope_note": "Os textos sobre parceiros tecnológicos e microcertificados descrevem o percurso típico de uma graduação e ecossistema de ferramentas; o acesso concreto a licenças e programas depende sempre da instituição e de parcerias vigentes. A secção «O que esta plataforma entrega» descreve as capacidades reais desta aplicação.",
+  "why": {
+    "heading": "Por que escolher essa área?",
+    "body": "A computação está em todo o lado: software, dados, redes, inteligência artificial e sistemas embarcados. Escolher esta área é apostar numa formação versátil, com forte procura no mercado e possibilidade de atuar em produto, engenharia, dados ou infraestrutura — sempre com espaço para aprendizagem contínua."
+  },
+  "highlights": [
+    {
+      "id": "study_assistant",
+      "icon": "star",
+      "title": "Personal Prof (apoio de estudo)",
+      "body": "Assistente de estudos disponível 24h para tirar dúvidas e fornecer resumos, promovendo revisão e profundidade. (Integração depende da configuração institucional; esta plataforma foca-se em progresso, conteúdo e certificação.)"
+    },
+    {
+      "id": "quarterly_certs",
+      "icon": "certificate",
+      "title": "Certificados ao longo do percurso",
+      "body": "Microcertificados por blocos temáticos ajudam a mostrar conquistas no currículo antes da conclusão final. Nesta plataforma, o certificado é emitido quando cumpres os requisitos definidos no currículo integrado."
+    },
+    {
+      "id": "labs_stack",
+      "icon": "lab",
+      "title": "Laboratórios e ferramentas",
+      "body": "O percurso prepara-te para trabalhar com ecossistemas reais: nuvem, repositórios, bases de dados e redes. Parceiros típicos incluem fornecedores como Microsoft, AWS, Oracle, GitHub e Cisco — conforme disponibilidade institucional."
+    }
+  ],
+  "learning_path": {
+    "heading": "O que você irá aprender",
+    "trimesters": [
+      {
+        "order": 1,
+        "title": "FrontEnd Development",
+        "hours": 216,
+        "summary": "No trimestre FrontEnd Development, desenvolve competências práticas em tecnologia, criando interfaces dinâmicas e sistemas modernos, alinhadas ao mercado e ao restante curso de Ciência da Computação.",
+        "disciplines": [
+          "Desenvolvimento FrontEnd",
+          "Arquitetura de Computadores do Século XXI",
+          "Criação de Aplicações e Sistemas"
+        ]
+      },
+      {
+        "order": 2,
+        "title": "Software Requirements",
+        "hours": 184,
+        "summary": "Compreensão e especificação de requisitos de software: levantamento, modelação e comunicação com stakeholders — base para projetos fiáveis e testáveis.",
+        "disciplines": [
+          "Engenharia de Requisitos",
+          "Modelação de sistemas",
+          "Gestão de escopo e qualidade"
+        ]
+      },
+      {
+        "order": 3,
+        "title": "Programming Languages",
+        "hours": 216,
+        "summary": "Paradigmas e linguagens: sintaxe, semântica, abstração e boas práticas para construir soluções legíveis, seguras e manuteníveis.",
+        "disciplines": [
+          "Paradigmas de programação",
+          "Linguagens compiladas e interpretadas",
+          "Ferramentas de build e depuração"
+        ]
+      },
+      {
+        "order": 4,
+        "title": "Object Oriented Programming",
+        "hours": 144,
+        "summary": "Projeto orientado a objetos: encapsulamento, herança, polimorfismo e padrões aplicados a problemas reais.",
+        "disciplines": [
+          "OO e design de classes",
+          "Padrões de projeto",
+          "Testes e refatoração"
+        ]
+      }
+    ]
+  },
+  "audience": {
+    "heading": "Pra quem esse curso é indicado?",
+    "body": "O curso de Ciência da Computação é indicado para quem deseja entrar ou crescer no mercado de tecnologia — desenvolvendo software, soluções em inteligência artificial, big data ou IoT. Adequado a quem valoriza estudo flexível com suporte online, metodologia prática e carreira numa área em constante evolução."
+  },
+  "personal_prof": {
+    "heading": "Seu professor particular",
+    "subtitle": "Personal Prof",
+    "body": "O Personal Prof é um assistente de I.A. pensado para tirar dúvidas, produzir resumos em texto ou áudio e aprofundar temas. A disponibilidade e o formato dependem da integração institucional; usa esta plataforma para acompanhar módulos, progresso e certificação."
+  },
+  "acceleration": {
+    "heading": "Acelere sua carreira",
+    "body": "Em vez de esperar apenas pelo diploma final, podes somar microcertificados ao longo do percurso e reforçar o currículo a cada trimestre. Cada conquista documentada aproxima-te do mercado com provas concretas de competências."
+  },
+  "microcertificates": {
+    "heading": "Microcertificados que fazem parte desta graduação",
+    "intro": "Conheça os eixos temáticos que costumam compor a oferta de microcertificados ao longo do bacharelado:",
+    "items": [
+      "FrontEnd Development",
+      "Programming Languages",
+      "Object Oriented Programming",
+      "Smart Data Structures",
+      "Mobile Developer",
+      "Cloud Platform",
+      "Software Engineering",
+      "DB Developer",
+      "BI & Big Data",
+      "IA Developer",
+      "IoT Developer",
+      "Computational Theory",
+      "Project Methodologies",
+      "Computational Science",
+      "Distributed Computing"
+    ]
+  },
+  "tool_partners": {
+    "heading": "Ferramentas e ecossistema",
+    "intro": "Durante o percurso, é comum utilizar plataformas e conteúdos oficiais de grandes fornecedores — quando a instituição disponibiliza acesso. Exemplos típicos:",
+    "items": [
+      {
+        "id": "microsoft",
+        "name": "Microsoft",
+        "description": "Produtividade e produtos de desenvolvimento: desde suítes de escritório a ferramentas de dados e sistemas, conforme catálogo institucional."
+      },
+      {
+        "id": "aws",
+        "name": "AWS",
+        "description": "Serviços em nuvem, automação e boas práticas para repositórios, APIs e infraestrutura elástica."
+      },
+      {
+        "id": "oracle",
+        "name": "Oracle",
+        "description": "Modelagem e gestão de bases de dados, consultas e ambientes de laboratório para dados relacionais."
+      },
+      {
+        "id": "github",
+        "name": "GitHub",
+        "description": "Controlo de versões, revisão de código e colaboração em projetos com fluxos de trabalho modernos."
+      },
+      {
+        "id": "cisco",
+        "name": "Cisco",
+        "description": "Materiais de redes e segurança (ex.: fundamentos de rede e rotas) alinhados a certificações reconhecidas na indústria."
+      }
+    ]
+  },
+  "platform_alignment": {
+    "heading": "O que esta plataforma entrega",
+    "items": [
+      {
+        "id": "modules_progress",
+        "title": "Módulos e progresso",
+        "body": "Módulos alinhados ao grafo do currículo (`data/curriculum.json`); registo de conclusão e percentagem de progresso na interface."
+      },
+      {
+        "id": "encrypted_content",
+        "title": "Conteúdo protegido",
+        "body": "Corpo dos módulos armazenado encriptado (Fernet); só é desencriptado no servidor para utilizadores autenticados."
+      },
+      {
+        "id": "certificate_pdf",
+        "title": "Certificado e verificação",
+        "body": "Emissão de certificado PDF ao cumprir requisitos; validação pública por serial sem expor dados pessoais."
+      },
+      {
+        "id": "sessions_security",
+        "title": "Sessões e administração",
+        "body": "Autenticação com JWT de curta duração e refresh opaco; administrador pode revogar sessões e auditar ações sensíveis."
+      },
+      {
+        "id": "pwa",
+        "title": "Web e PWA",
+        "body": "Interface web leve com manifest e cache offline parcial (service worker), para acompanhar o curso em vários dispositivos."
+      }
+    ]
+  }
+}

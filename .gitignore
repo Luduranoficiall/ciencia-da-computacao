@@ -1,0 +1,20 @@
+# Progresso pessoal (opcional): copie progress.example.json e use:
+#   python3 tools/curriculum_progress.py --progress data/progress.local.json
+data/progress.local.json
+
+# Ambiente local: python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
+.venv/
+**/.venv/
+
+# Segredos e artefactos locais
+.env
+.env.*
+!.env.example
+platform/.env
+*.db
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+platform/data/

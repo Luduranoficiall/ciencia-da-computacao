@@ -1,0 +1,21 @@
+{
+  "description": "Disciplinas em curriculum.json intencionalmente fora do diagrama Mermaid resumido no README. Ao acrescentar no ao grafo: atualizar este ficheiro, ou expandir o diagrama + readme_mermaid_map.json.",
+  "ids": [
+    "alg_lin1",
+    "calc1",
+    "calc2",
+    "calc3",
+    "comp_grafica",
+    "compiladores",
+    "eng_sw",
+    "funcional",
+    "geo",
+    "met_num",
+    "met_pesquisa",
+    "prob_est",
+    "prog_logica",
+    "prog_mat",
+    "quantica",
+    "teo_grafos"
+  ]
+}

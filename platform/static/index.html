@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Curso - Plataforma</title>
+    <meta name="theme-color" content="#0b1220" />
+    <link rel="manifest" href="/ui/manifest.json" />
+    <link rel="stylesheet" href="/ui/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="topbar">
+        <div class="brand" id="brandTitle">Curso</div>
+        <div class="actions">
+          <button id="logoutBtn" class="btn ghost" type="button">Sair</button>
+        </div>
+      </header>
+
+      <section id="landingSection" class="card landing">
+        <div id="landingRoot" class="landingInner"></div>
+        <p id="landingError" class="error" role="alert" hidden></p>
+      </section>
+
+      <section id="loginSection" class="card">
+        <h2>Entrar</h2>
+        <form id="loginForm">
+          <label>
+            Email
+            <input id="email" name="email" type="email" autocomplete="username" required />
+          </label>
+          <label>
+            Palavra-passe
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              minlength="8"
+            />
+          </label>
+          <button class="btn primary" type="submit">Entrar</button>
+          <p id="loginError" class="error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section id="appSection" class="card" hidden>
+        <h2>Seu progresso</h2>
+        <div id="progressWrap" class="progressWrap" hidden>
+          <div class="progressMeta" id="progressMeta"></div>
+          <div class="progressTrack" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <div class="progressFill" id="progressFill"></div>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <h3>Módulos</h3>
+            <div id="modulesList" class="list"></div>
+          </div>
+          <div>
+            <h3>Certificado</h3>
+            <div id="certificateBox" class="muted"></div>
+            <p class="muted small" id="verifyHint" hidden>
+              Validar certificado publicamente:
+              <a href="/ui/verify.html">verificar serial</a>
+            </p>
+            <div class="row">
+              <button id="issueCertBtn" class="btn" type="button" disabled>Gerar certificado</button>
+              <button id="downloadCertBtn" class="btn" type="button" disabled>Baixar PDF</button>
+            </div>
+            <div id="certError" class="error" role="alert" hidden></div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="muted small">
+        Dica: se você esquecer a senha, fale comigo (admin).
+        <span class="footerSep">·</span>
+        <a href="/ui/verify.html">Validar certificado</a>
+      </footer>
+    </div>
+
+    <script src="/ui/app.js"></script>
+  </body>
+</html>
+

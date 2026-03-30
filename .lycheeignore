@@ -1,0 +1,8 @@
+# Redes sociais costumam bloquear bots do CI
+https://twitter.com/*
+https://x.com/*
+https://www.linkedin.com/*
+
+# Opcional: descomente se o Coursera retornar 403 intermitente no GitHub Actions
+# https://pt.coursera.org/*
+# https://www.coursera.org/*

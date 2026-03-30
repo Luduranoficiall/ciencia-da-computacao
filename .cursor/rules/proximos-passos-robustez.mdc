@@ -1,0 +1,24 @@
+---
+description: Próximos passos e iterações — prioridade absoluta em robustez (currículo e ferramentas)
+alwaysApply: true
+---
+
+# Próximos passos: robustez em primeiro lugar
+
+Quando o utilizador pedir **próximos passos**, **iterações**, **expandir**, **melhorar** ou expressões equivalentes (incluindo “arrasa”), tratar isso como pedido de **aumentar robustez**, não só de conteúdo novo.
+
+## O que priorizar (por ordem)
+
+1. **Invariantes e verificação automática** — JSON Schema em `data/schemas/` + `jsonschema`, depois validadores Python, CI com `pip install -r requirements-dev.txt`, falhas explícitas (DAG, `title`/`tags`, mapa Mermaid, lista omit).
+2. **Testes** — cobrir casos limite e regressões nas ferramentas Python e no formato dos dados (`data/*.json`).
+3. **Consistência entre artefactos** — `README` / Mermaid / `data/curriculum.json` / `readme_mermaid_diagram_omit.json` / SVGs em `assets/` / docs; um único “mentiroso” é bug.
+4. **Documentação operacional** — como validar localmente, o que o CI faz, o que quebra quando alguém edita o grafo mal.
+
+## O que evitar como “próximo passo” isolado
+
+- Listas longas sem critério de fecho ou sem ligação a provas de nível / checklist.
+- Mudanças só cosméticas quando existir risco técnico ou inconsistência por resolver.
+
+## Tom
+
+Implementar de forma concreta (diffs, scripts, testes), não só descrever intenções.

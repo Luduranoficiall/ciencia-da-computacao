@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 520" role="img" aria-labelledby="title desc">
+  <title id="title">Mapa de dependências do currículo</title>
+  <desc id="desc">Fluxo de pré-requisitos entre blocos de fundamentos, programação, sistemas, teoria e inteligência artificial, convergindo para prática e portfólio.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f1419"/>
+      <stop offset="100%" style="stop-color:#1a2332"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#5eead4"/>
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg)"/>
+  <text x="460" y="36" text-anchor="middle" fill="#e2e8f0" font-family="system-ui,Segoe UI,sans-serif" font-size="22" font-weight="700">Núcleo de dependências (visão estratégica)</text>
+  <text x="460" y="58" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Quanto mais à esquerda e em baixo na base, mais sustenta o que vem depois — não pule fundamentos.</text>
+  <g font-family="system-ui,sans-serif" font-size="11" font-weight="600">
+    <rect x="40" y="100" width="130" height="44" rx="8" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5" filter="url(#glow)"/>
+    <text x="105" y="127" text-anchor="middle" fill="#f0f9ff">Lógica e Discreta</text>
+    <rect x="40" y="200" width="130" height="44" rx="8" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="105" y="227" text-anchor="middle" fill="#f0f9ff">Circuitos / Bits</text>
+    <rect x="40" y="300" width="130" height="44" rx="8" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="105" y="327" text-anchor="middle" fill="#f0f9ff">Python I → II</text>
+    <rect x="220" y="150" width="140" height="44" rx="8" fill="#312e81" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="290" y="177" text-anchor="middle" fill="#ede9fe">Estruturas de Dados</text>
+    <rect x="220" y="250" width="140" height="44" rx="8" fill="#312e81" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="290" y="277" text-anchor="middle" fill="#ede9fe">OO e Eng. básica</text>
+    <rect x="220" y="350" width="140" height="44" rx="8" fill="#312e81" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="290" y="377" text-anchor="middle" fill="#ede9fe">Arquitetura I → II</text>
+    <rect x="410" y="100" width="150" height="44" rx="8" fill="#134e4a" stroke="#2dd4bf" stroke-width="1.5"/>
+    <text x="485" y="127" text-anchor="middle" fill="#ccfbf1">Grafos e Algoritmos</text>
+    <rect x="410" y="200" width="150" height="44" rx="8" fill="#134e4a" stroke="#2dd4bf" stroke-width="1.5"/>
+    <text x="485" y="227" text-anchor="middle" fill="#ccfbf1">SO e Redes</text>
+    <rect x="410" y="300" width="150" height="44" rx="8" fill="#134e4a" stroke="#2dd4bf" stroke-width="1.5"/>
+    <text x="485" y="327" text-anchor="middle" fill="#ccfbf1">BD · transações</text>
+    <rect x="600" y="120" width="150" height="44" rx="8" fill="#713f12" stroke="#fbbf24" stroke-width="1.5"/>
+    <text x="675" y="147" text-anchor="middle" fill="#fef3c7">Autômatos / Comp.</text>
+    <rect x="600" y="220" width="150" height="44" rx="8" fill="#713f12" stroke="#fbbf24" stroke-width="1.5"/>
+    <text x="675" y="247" text-anchor="middle" fill="#fef3c7">IA → Deep Learning</text>
+    <rect x="600" y="320" width="150" height="44" rx="8" fill="#713f12" stroke="#fbbf24" stroke-width="1.5"/>
+    <text x="675" y="347" text-anchor="middle" fill="#fef3c7">Dist. / Segurança</text>
+    <rect x="780" y="200" width="120" height="56" rx="10" fill="#831843" stroke="#fb7185" stroke-width="2"/>
+    <text x="840" y="225" text-anchor="middle" fill="#ffe4e6" font-size="12">Prática</text>
+    <text x="840" y="242" text-anchor="middle" fill="#ffe4e6" font-size="12">e Portfólio</text>
+  </g>
+  <g stroke="#5eead4" stroke-width="1.8" fill="none" marker-end="url(#arrow)" opacity="0.85">
+    <path d="M170 122 L220 172"/>
+    <path d="M170 222 L220 172"/>
+    <path d="M170 322 L220 272"/>
+    <path d="M360 172 L410 122"/>
+    <path d="M360 272 L410 222"/>
+    <path d="M360 372 L410 222"/>
+    <path d="M560 122 L600 142"/>
+    <path d="M560 222 L600 242"/>
+    <path d="M560 322 L600 342"/>
+    <path d="M750 242 L780 228"/>
+  </g>
+  <text x="460" y="490" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="11">Legenda: azul = fundamento · roxo = programação · verde-água = sistemas · âmbar = teoria/IA · rosa = entrega no mundo real</text>
+</svg>

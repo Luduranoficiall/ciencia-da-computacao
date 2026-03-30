@@ -1,0 +1,9 @@
+{
+  "name": "Curso - Plataforma",
+  "short_name": "Curso",
+  "start_url": "/ui/",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#4f8cff"
+}
+

@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luduranoficiall/ciencia-da-computacao/schemas/course_presentation.schema.json",
+  "title": "Course presentation (landing / marketing copy)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "title",
+    "tagline",
+    "why",
+    "highlights",
+    "learning_path",
+    "audience",
+    "personal_prof",
+    "acceleration",
+    "microcertificates",
+    "tool_partners",
+    "platform_alignment",
+    "scope_note"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "tagline": { "type": "string", "minLength": 1 },
+    "scope_note": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Separar marketing do curso vs o que a plataforma entrega de facto."
+    },
+    "why": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heading", "body"],
+      "properties": {
+        "heading": { "type": "string", "minLength": 1 },
+        "body": { "type": "string", "minLength": 1 }
+      }
+    },
+    "highlights": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "icon", "title", "body"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "icon": {
+            "type": "string",
+            "enum": ["star", "certificate", "lab", "sparkles", "book"]
+          },
+          "title": { "type": "string", "minLength": 1 },
+          "body": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "learning_path": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heading", "trimesters"],
+      "properties": {
+        "heading": { "type": "string", "minLength": 1 },
+        "trimesters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["order", "title", "hours", "summary", "disciplines"],
+            "properties": {
+              "order": { "type": "integer", "minimum": 1, "maximum": 24 },
+              "title": { "type": "string", "minLength": 1 },
+              "hours": { "type": "integer", "minimum": 1 },
+              "summary": { "type": "string", "minLength": 1 },
+              "disciplines": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "audience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heading", "body"],
+      "properties": {
+        "heading": { "type": "string", "minLength": 1 },
+        "body": { "type": "string", "minLength": 1 }
+      }
+    },
+    "personal_prof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heading", "subtitle", "body"],
+      "properties": {
+        "heading": { "type": "string", "minLength": 1 },
+        "subtitle": { "type": "string", "minLength": 1 },
+        "body": { "type": "string", "minLength": 1 }
+      }
+    },
+    "acceleration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heading", "body"],
+      "properties": {
+        "heading": { "type": "string", "minLength": 1 },
+        "body": { "type": "string", "minLength": 1 }
+      }
+    },
+    "microcertificates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heading", "intro", "items"],
+      "properties": {
+        "heading": { "type": "string", "minLength": 1 },
+        "intro": { "type": "string", "minLength": 1 },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "tool_partners": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heading", "intro", "items"],
+      "properties": {
+        "heading": { "type": "string", "minLength": 1 },
+        "intro": { "type": "string", "minLength": 1 },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "description"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "name": { "type": "string", "minLength": 1 },
+              "description": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "platform_alignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heading", "items"],
+      "properties": {
+        "heading": { "type": "string", "minLength": 1 },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title", "body"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "title": { "type": "string", "minLength": 1 },
+              "body": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

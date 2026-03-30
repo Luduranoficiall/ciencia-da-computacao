@@ -1,0 +1,45 @@
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    groups:
+      dev:
+        patterns:
+          - "*"
+
+# ---------------------------------------------------------------------------
+# Exemplos — descomente um bloco inteiro quando passar a existir no repo.
+# Documentação: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# ---------------------------------------------------------------------------
+#
+#  - package-ecosystem: "docker"
+#    directory: "/"
+#    schedule:
+#      interval: "monthly"
+#    open-pull-requests-limit: 3
+#
+#  - package-ecosystem: "gitsubmodule"
+#    directory: "/"
+#    schedule:
+#      interval: "monthly"
+#
+#  - package-ecosystem: "pip"
+#    directory: "/"
+#    schedule:
+#      interval: "monthly"
+#    # útil se no futuro houver requirements.txt / pyproject na raiz ou em /tools
