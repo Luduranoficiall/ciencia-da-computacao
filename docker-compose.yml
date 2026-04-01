@@ -1,0 +1,22 @@
+services:
+  plataforma:
+    build:
+      context: .
+      dockerfile: platform/Dockerfile
+    container_name: ciencia-computacao-platform
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: sqlite:////app/data/lms.db
+      CURRICULUM_JSON_PATH: /app/data/curriculum.json
+      COURSE_PRESENTATION_JSON_PATH: /app/data/course_presentation.json
+      CONTENT_ENCRYPTION_KEY: ${CONTENT_ENCRYPTION_KEY:-}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-openssl-rand-hex-32}
+      REQUIRE_HTTPS: "false"
+      COOKIE_SAMESITE: "lax"
+      CORS_ORIGINS: "*"
+      TRUSTED_HOSTS: ""
+      RATE_LIMIT_AUTH_PER_MINUTE: "30"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

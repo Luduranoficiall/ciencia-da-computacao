@@ -9,7 +9,15 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import CurrentUser
 from app.models import Certificate, CourseModule, StudentProgress, UserRole
-from app.schemas import CertificateStatusOut, ModuleContentOut, ModuleListOut, ProgressOut
+from app.schemas import (
+    AssistantAskIn,
+    AssistantAskOut,
+    CertificateStatusOut,
+    ModuleContentOut,
+    ModuleListOut,
+    ProgressOut,
+)
+from app.assistant_service import build_local_assistant_answer, consume_daily_quota
 from app.services import (
     get_module_plain,
     issue_certificate_if_needed,
@@ -160,4 +168,29 @@ def download_my_certificate(
         headers={
             "Content-Disposition": f'attachment; filename="certificado-{cert.serial_number}.pdf"'
         },
+    )
+
+
+@router.post("/assistant/ask", response_model=AssistantAskOut)
+def ask_assistant(
+    body: AssistantAskIn,
+    user: CurrentUser,
+    db: Annotated[Session, Depends(get_db)],
+) -> AssistantAskOut:
+    if user.role == UserRole.admin:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Assistente disponivel apenas para alunos")
+    if body.module_slug not in set(required_slugs(db)):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Modulo inexistente")
+    try:
+        remaining = consume_daily_quota(db, user.id)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, str(e)) from e
+    try:
+        answer = build_local_assistant_answer(db, body.module_slug, body.question)
+    except KeyError as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Modulo inexistente") from e
+    return AssistantAskOut(
+        module_slug=body.module_slug,
+        answer=answer,
+        usage_remaining_today=remaining,
     )

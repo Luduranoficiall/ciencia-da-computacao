@@ -9,10 +9,12 @@ Backend **FastAPI** com:
 - **Anti-duplicidade**: email único; par `(user_id, module_slug)` único em progresso; um certificado por `user_id` e `serial` único.
 - **Multi-dispositivo**: API stateless com JWT; qualquer cliente (web responsiva, app nativa, PWA futura) usa os mesmos endpoints. **CORS** configurável.
 - **UI do aluno (web/PWA)**: servida em `GET /ui/` (login, lista de módulos, progresso e download do certificado).
+- **Personal Prof (assistente local)**: `POST /student/assistant/ask` com quota diária por aluno (`ASSISTANT_DAILY_LIMIT_PER_USER`).
 - **Verificacao publica do certificado** (sem dados pessoais): `GET /public/certificates/verify/{serial}` (serial com `A-Za-z0-9_-`); pagina em `/ui/verify.html`.
 - **Landing do curso** (sem login): textos em `data/course_presentation.json` (validado no CI com JSON Schema); `GET /public/course-presentation`; a UI em `/ui/` carrega e mostra o conteúdo antes do login.
 - **Robustez**: SQLite com **WAL** + `pool_pre_ping`; `GET /health/ready` verifica a BD; cabecalho **`X-Request-ID`**; **rate limit** opcional em `POST /auth/token`; **`TrustedHostMiddleware`** opcional.
 - **JWT** com `iat`/`exp` em timestamp (interoperavel).
+- **Password policy + lockout**: maiuscula/minuscula/numero/simbolo configuraveis; bloqueio temporario por conta apos falhas repetidas de login.
 - **Sessao web**: apos login, cookies **HttpOnly** `access_token` e `refresh_token` (este ultimo so para `POST /auth/refresh` e `POST /auth/logout`). A UI usa `credentials: include` e **nao** guarda tokens em `localStorage`. A API continua a aceitar `Authorization: Bearer` (Swagger / scripts).
 - **Controlo admin**: `GET /admin/students` inclui `active_sessions` (refresh tokens ainda validos). `POST /admin/students/{id}/revoke-sessions` revoga **todos** os refresh tokens e **invalida imediatamente** os JWTs de access desse utilizador (claim `tv` / `access_token_version` na BD). Migracao SQLite automatica em arranque se faltar a coluna `users.access_token_version`.
 - **Auditoria**: acoes administrativas sao um conjunto **fechado** (`AuditAction` em `app/audit_service.py`); `record_audit_log` so aceita esses valores; `GET /admin/audit-log?action=...` usa o mesmo enum e devolve **422** se o valor nao for valido (OpenAPI lista os valores).
@@ -40,6 +42,16 @@ Abrir `http://127.0.0.1:8000/docs` (Swagger).
 6. Aluno: lista modulos, lê conteúdo, marca `POST /student/progress/{slug}`, quando elegível `POST /student/certificate/issue` e `GET /student/certificate/pdf`.
 7. UI do aluno: acede a `http://127.0.0.1:8000/ui/` e usa as mesmas credenciais.
 8. Validar certificado (publico): `http://127.0.0.1:8000/ui/verify.html`
+
+## Docker (producao/dev)
+
+No diretorio raiz do repositorio:
+
+```bash
+docker compose up -d --build
+```
+
+API em `http://127.0.0.1:8000` com dados persistidos em `./data`.
 
 ## Produção (mínimo)
 

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import re
 
 import bcrypt
 import jwt
@@ -16,6 +17,17 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 def hash_password(plain: str) -> str:
     return bcrypt.hashpw(plain[:72].encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def validate_password_strength(plain: str) -> None:
+    if settings.password_require_upper and not re.search(r"[A-Z]", plain):
+        raise ValueError("A palavra-passe deve conter pelo menos uma letra maiuscula.")
+    if settings.password_require_lower and not re.search(r"[a-z]", plain):
+        raise ValueError("A palavra-passe deve conter pelo menos uma letra minuscula.")
+    if settings.password_require_digit and not re.search(r"[0-9]", plain):
+        raise ValueError("A palavra-passe deve conter pelo menos um numero.")
+    if settings.password_require_symbol and not re.search(r"[^A-Za-z0-9]", plain):
+        raise ValueError("A palavra-passe deve conter pelo menos um simbolo.")
 
 
 def create_access_token(sub: str, role: str, user_id: int, token_version: int) -> str:

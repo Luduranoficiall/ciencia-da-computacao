@@ -4,13 +4,14 @@ from app.config import settings
 
 
 def attach_auth_cookies(response: JSONResponse, access: str, refresh: str) -> None:
+    secure_cookie = settings.require_https or settings.cookie_samesite == "none"
     response.set_cookie(
         key=settings.access_cookie_name,
         value=access,
         httponly=True,
         max_age=settings.access_token_expire_minutes * 60,
-        samesite="lax",
-        secure=settings.require_https,
+        samesite=settings.cookie_samesite,
+        secure=secure_cookie,
         path="/",
     )
     response.set_cookie(
@@ -18,8 +19,8 @@ def attach_auth_cookies(response: JSONResponse, access: str, refresh: str) -> No
         value=refresh,
         httponly=True,
         max_age=settings.refresh_token_expire_days * 86400,
-        samesite="lax",
-        secure=settings.require_https,
+        samesite=settings.cookie_samesite,
+        secure=secure_cookie,
         path="/auth",
     )
 

@@ -104,3 +104,14 @@ class AuditLogOut(BaseModel):
     request_id: str | None = None
     ip_address: str | None = None
     created_at: datetime
+
+
+class AssistantAskIn(BaseModel):
+    module_slug: str = Field(pattern=r"^[a-z][a-z0-9_]*$", max_length=64)
+    question: str = Field(min_length=5, max_length=4000)
+
+
+class AssistantAskOut(BaseModel):
+    module_slug: str
+    answer: str
+    usage_remaining_today: int

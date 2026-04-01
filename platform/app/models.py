@@ -42,6 +42,10 @@ class User(Base):
     access_token_version: Mapped[int] = mapped_column(
         Integer, nullable=False, server_default="0", default=0
     )
+    failed_login_attempts: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="0", default=0
+    )
+    locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     progress_rows: Mapped[list[StudentProgress]] = relationship(back_populates="user")
@@ -129,4 +133,19 @@ class AuditLog(Base):
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class StudentAssistantUsage(Base):
+    """Contador diario de uso do assistente por aluno."""
+
+    __tablename__ = "student_assistant_usage"
+    __table_args__ = (UniqueConstraint("user_id", "usage_date", name="uq_assistant_usage_user_day"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    usage_date: Mapped[str] = mapped_column(String(10), nullable=False, index=True)  # YYYY-MM-DD (UTC)
+    request_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0", default=0)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )

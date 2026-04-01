@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -12,9 +13,17 @@ from app.database import get_db
 from app.models import User, UserRole
 from app.refresh_token_service import create_refresh_token_row, revoke_refresh_token, rotate_refresh_token
 from app.schemas import OkOut, RefreshIn, RegisterIn, TokenOut
-from app.security import create_access_token, hash_password, verify_password
+from app.security import create_access_token, hash_password, validate_password_strength, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+def _as_utc(dt: datetime | None) -> datetime | None:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def _json_token_response(access: str, refresh: str) -> JSONResponse:
@@ -29,11 +38,27 @@ def login(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Annotated[Session, Depends(get_db)],
 ) -> JSONResponse:
+    now = datetime.now(timezone.utc)
     user = db.scalars(select(User).where(User.email == form.username)).first()
-    if not user or not verify_password(form.password, user.hashed_password):
+    if not user:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Email ou palavra-passe incorretos")
+    locked_until = _as_utc(user.locked_until)
+    if locked_until and locked_until > now:
+        raise HTTPException(
+            status.HTTP_423_LOCKED,
+            f"Conta temporariamente bloqueada. Tente novamente apos {locked_until.isoformat()}",
+        )
+    if not verify_password(form.password, user.hashed_password):
+        user.failed_login_attempts = int(user.failed_login_attempts or 0) + 1
+        if user.failed_login_attempts >= settings.max_failed_logins:
+            user.locked_until = now + timedelta(minutes=settings.lockout_minutes)
+            user.failed_login_attempts = 0
+        db.commit()
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Email ou palavra-passe incorretos")
     if not user.is_active:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Conta desativada")
+    user.failed_login_attempts = 0
+    user.locked_until = None
     access = create_access_token(
         sub=user.email,
         role=user.role.value,
@@ -54,6 +79,10 @@ def register(body: RegisterIn, db: Annotated[Session, Depends(get_db)]) -> JSONR
         )
     if db.scalars(select(User).where(User.email == body.email)).first():
         raise HTTPException(status.HTTP_409_CONFLICT, "Email ja registado")
+    try:
+        validate_password_strength(body.password)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e)) from e
     user = User(
         email=body.email,
         full_name=body.full_name,

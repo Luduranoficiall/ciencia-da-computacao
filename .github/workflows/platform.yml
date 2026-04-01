@@ -5,11 +5,15 @@ on:
     paths:
       - "platform/**"
       - "data/course_presentation.json"
+      - "docker-compose.yml"
+      - ".dockerignore"
       - ".github/workflows/platform.yml"
   pull_request:
     paths:
       - "platform/**"
       - "data/course_presentation.json"
+      - "docker-compose.yml"
+      - ".dockerignore"
       - ".github/workflows/platform.yml"
 
 permissions:
@@ -32,3 +36,10 @@ jobs:
         run: pip install -r requirements-dev.txt
       - name: Pytest
         run: pytest tests/ -v
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Docker Compose build
+        run: docker compose build

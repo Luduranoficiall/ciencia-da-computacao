@@ -43,6 +43,7 @@ def ensure_sqlite_schema(engine: Engine) -> None:
     if not str(engine.url).startswith("sqlite"):
         return
     _ensure_users_access_token_version(engine)
+    _ensure_users_failed_login_state(engine)
     _ensure_audit_log_table(engine)
 
 
@@ -59,3 +60,19 @@ def _ensure_users_access_token_version(engine: Engine) -> None:
                 "ALTER TABLE users ADD COLUMN access_token_version INTEGER NOT NULL DEFAULT 0"
             )
         )
+
+
+def _ensure_users_failed_login_state(engine: Engine) -> None:
+    insp = inspect(engine)
+    if not insp.has_table("users"):
+        return
+    cols = {c["name"] for c in insp.get_columns("users")}
+    with engine.begin() as conn:
+        if "failed_login_attempts" not in cols:
+            conn.execute(
+                text(
+                    "ALTER TABLE users ADD COLUMN failed_login_attempts INTEGER NOT NULL DEFAULT 0"
+                )
+            )
+        if "locked_until" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN locked_until DATETIME NULL"))

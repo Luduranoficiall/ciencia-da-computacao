@@ -311,7 +311,7 @@ def test_audit_log_action_filter(client):
         headers=h,
         json={
             "email": "auditfilt@example.com",
-            "password": "longpassword1",
+                "password": "Longpassword1!",
             "full_name": "Novo",
         },
     )
@@ -390,6 +390,105 @@ def test_course_presentation_missing_returns_503(client, monkeypatch):
     )
     r = client.get("/public/course-presentation")
     assert r.status_code == 503
+
+
+def test_admin_create_student_rejects_weak_password(client):
+    db = get_session_factory()()
+    db.add(
+        User(
+            email="admin@test.local",
+            full_name="Admin",
+            hashed_password=hash_password("adminpass12"),
+            role=UserRole.admin,
+        )
+    )
+    db.commit()
+    db.close()
+    adm = _admin_token(client)
+    r = client.post(
+        "/admin/students",
+        headers={"Authorization": f"Bearer {adm}"},
+        json={"email": "weak@example.com", "password": "weakpass12", "full_name": "Weak"},
+    )
+    assert r.status_code == 422
+
+
+def test_login_lockout_after_repeated_failures(client):
+    from app import config
+
+    db = get_session_factory()()
+    db.add(
+        User(
+            email="stu@test.local",
+            full_name="Aluno",
+            hashed_password=hash_password("studentpass12"),
+            role=UserRole.student,
+        )
+    )
+    db.commit()
+    db.close()
+
+    config.settings.max_failed_logins = 2
+    config.settings.lockout_minutes = 1
+    for _ in range(2):
+        r = client.post(
+            "/auth/token",
+            data={"username": "stu@test.local", "password": "errada-123"},
+        )
+        assert r.status_code == 401
+    r2 = client.post(
+        "/auth/token",
+        data={"username": "stu@test.local", "password": "studentpass12"},
+    )
+    assert r2.status_code == 423
+
+
+def test_student_assistant_answer_and_quota(client):
+    from app import config
+
+    db = get_session_factory()()
+    db.add(
+        User(
+            email="stu@test.local",
+            full_name="Aluno",
+            hashed_password=hash_password("studentpass12"),
+            role=UserRole.student,
+        )
+    )
+    db.add(
+        CourseModule(
+            slug="m1",
+            title="Modulo 1",
+            ciphertext=encrypt_content("Conceitos base do modulo 1\nExemplo pratico"),
+        )
+    )
+    db.commit()
+    db.close()
+    config.settings.assistant_daily_limit_per_user = 2
+
+    st = _student_token(client)
+    h = {"Authorization": f"Bearer {st}"}
+    r1 = client.post(
+        "/student/assistant/ask",
+        headers=h,
+        json={"module_slug": "m1", "question": "Como estudar este modulo?"},
+    )
+    assert r1.status_code == 200
+    assert "Resumo do modulo" in r1.json()["answer"]
+    assert r1.json()["usage_remaining_today"] == 1
+
+    r2 = client.post(
+        "/student/assistant/ask",
+        headers=h,
+        json={"module_slug": "m1", "question": "Mais um resumo por favor."},
+    )
+    assert r2.status_code == 200
+    r3 = client.post(
+        "/student/assistant/ask",
+        headers=h,
+        json={"module_slug": "m1", "question": "Outra pergunta final."},
+    )
+    assert r3.status_code == 429
 
 
 def test_student_cannot_list_audit_log(client):
@@ -473,13 +572,13 @@ def test_duplicate_email_blocked(client):
     r = client.post(
         "/admin/students",
         headers={"Authorization": f"Bearer {tok}"},
-        json={"email": "a@b.c", "password": "longpassword1", "full_name": "A"},
+        json={"email": "a@b.c", "password": "Longpassword1!", "full_name": "A"},
     )
     assert r.status_code == 201
     r2 = client.post(
         "/admin/students",
         headers={"Authorization": f"Bearer {tok}"},
-        json={"email": "a@b.c", "password": "otherpass12", "full_name": "B"},
+        json={"email": "a@b.c", "password": "Otherpass12!", "full_name": "B"},
     )
     assert r2.status_code == 409
 

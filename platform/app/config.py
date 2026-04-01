@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     # Cookies HttpOnly (UI em mesmo site ou CORS explicito com credentials)
     access_cookie_name: str = "access_token"
     refresh_cookie_name: str = "refresh_token"
+    cookie_samesite: str = "lax"
 
     database_url: str = "sqlite:///./data/lms.db"
 
@@ -55,6 +56,16 @@ class Settings(BaseSettings):
 
     # Limite de tentativas de login por IP por minuto (0 = desligado)
     rate_limit_auth_per_minute: int = 30
+    # Bloqueio por utilizador apos falhas repetidas de login
+    max_failed_logins: int = 5
+    lockout_minutes: int = 15
+    # Password policy (alfa-num + simbolo)
+    password_require_upper: bool = True
+    password_require_lower: bool = True
+    password_require_digit: bool = True
+    password_require_symbol: bool = True
+    # Personal Prof (assistente de estudo)
+    assistant_daily_limit_per_user: int = 30
 
     @field_validator("jwt_secret")
     @classmethod
@@ -63,6 +74,14 @@ class Settings(BaseSettings):
         if len(v) < 32:
             raise ValueError("JWT_SECRET deve ter pelo menos 32 caracteres (HS256).")
         return v
+
+    @field_validator("cookie_samesite")
+    @classmethod
+    def validate_cookie_samesite(cls, v: str) -> str:
+        low = v.lower().strip()
+        if low not in {"lax", "strict", "none"}:
+            raise ValueError("COOKIE_SAMESITE deve ser lax, strict ou none.")
+        return low
 
 
 settings = Settings()

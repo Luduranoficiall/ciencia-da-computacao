@@ -19,7 +19,7 @@ from app.schemas import (
     RevokeSessionsOut,
     StudentOverviewOut,
 )
-from app.security import encrypt_content, hash_password
+from app.security import encrypt_content, hash_password, validate_password_strength
 from app.refresh_token_service import count_active_refresh_tokens, revoke_all_user_refresh_tokens
 from app.services import user_completed_set
 
@@ -106,6 +106,10 @@ def create_student(
 ) -> dict:
     if db.scalars(select(User).where(User.email == body.email)).first():
         raise HTTPException(status.HTTP_409_CONFLICT, "Email ja existe (duplicidade bloqueada)")
+    try:
+        validate_password_strength(body.password)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e)) from e
     user = User(
         email=body.email,
         full_name=body.full_name,

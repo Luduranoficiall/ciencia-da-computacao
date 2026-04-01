@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -15,6 +16,8 @@ from app.middleware_extra import RequestIdAndSecurityMiddleware
 from app.models import User, UserRole
 from app.routers import admin, auth, public, student
 from app.security import hash_password
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 @asynccontextmanager
