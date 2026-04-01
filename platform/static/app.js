@@ -299,6 +299,27 @@ function renderModules(modules, completedSet) {
           Concluir
         </button>
       </div>
+      <div class="assistantWrap">
+        <div class="assistantHeading muted small">Personal Prof</div>
+        <label class="assistantLabel">
+          <span class="sr-only">Pergunta sobre este módulo</span>
+          <textarea
+            class="assistantQ"
+            rows="2"
+            maxlength="4000"
+            minlength="5"
+            placeholder="Pergunta sobre este módulo (mín. 5 caracteres)…"
+          ></textarea>
+        </label>
+        <div class="row moduleActions">
+          <button class="btn" type="button" data-action="assistant-ask" data-slug="${escapeHtml(m.slug)}">
+            Perguntar ao assistente
+          </button>
+        </div>
+        <p class="assistantQuota muted small" hidden></p>
+        <pre class="assistantOut" hidden></pre>
+        <p class="assistantErr error" role="alert" hidden></p>
+      </div>
       <div class="moduleBody" id="body-${escapeHtml(m.slug)}" hidden></div>
     `;
 
@@ -447,9 +468,42 @@ document.addEventListener("click", async (ev) => {
   try {
     if (action === "content") await loadModuleContent(slug);
     if (action === "progress") await markProgress(slug);
+    if (action === "assistant-ask") {
+      const modItem = btn.closest(".moduleItem");
+      if (!modItem) return;
+      const ta = modItem.querySelector(".assistantQ");
+      const out = modItem.querySelector(".assistantOut");
+      const aerr = modItem.querySelector(".assistantErr");
+      const quota = modItem.querySelector(".assistantQuota");
+      const q = (ta?.value || "").trim();
+      if (q.length < 5) {
+        setError(aerr, "A pergunta deve ter pelo menos 5 caracteres.", false);
+        return;
+      }
+      setError(aerr, "", true);
+      btn.disabled = true;
+      try {
+        const res = await apiJson("/student/assistant/ask", {
+          method: "POST",
+          body: JSON.stringify({ module_slug: slug, question: q }),
+        });
+        out.textContent = res.answer;
+        out.hidden = false;
+        quota.textContent = `Pedidos restantes hoje: ${res.usage_remaining_today}`;
+        quota.hidden = false;
+      } finally {
+        btn.disabled = false;
+      }
+    }
   } catch (e) {
-    const cer = document.getElementById("certError");
-    setError(cer, e?.message || "Falha na ação.");
+    const modItem = btn.closest(".moduleItem");
+    const aerr = modItem?.querySelector?.(".assistantErr");
+    if (btn.dataset.action === "assistant-ask" && aerr) {
+      setError(aerr, e?.message || "Falha ao contactar o assistente.", false);
+    } else {
+      const cer = document.getElementById("certError");
+      setError(cer, e?.message || "Falha na ação.");
+    }
   }
 });
 

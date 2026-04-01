@@ -40,7 +40,7 @@ Abrir `http://127.0.0.1:8000/docs` (Swagger).
 4. Atualizar conteúdo: `POST /admin/modules` com `slug`, `title`, `body_markdown` (substitui se o `slug` já existir).
 5. Criar alunos: `POST /admin/students` com email, password, `full_name` (nome no certificado).
 6. Aluno: lista modulos, lê conteúdo, marca `POST /student/progress/{slug}`, quando elegível `POST /student/certificate/issue` e `GET /student/certificate/pdf`.
-7. UI do aluno: acede a `http://127.0.0.1:8000/ui/` e usa as mesmas credenciais.
+7. UI do aluno: acede a `http://127.0.0.1:8000/ui/` e usa as mesmas credenciais; em cada módulo pode **Perguntar ao assistente** (Personal Prof), que chama `POST /student/assistant/ask`.
 8. Validar certificado (publico): `http://127.0.0.1:8000/ui/verify.html`
 
 ## Docker (producao/dev)
