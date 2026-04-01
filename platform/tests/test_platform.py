@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from app.database import get_session_factory
 from app.models import CourseModule, User, UserRole
@@ -489,6 +490,56 @@ def test_student_assistant_answer_and_quota(client):
         json={"module_slug": "m1", "question": "Outra pergunta final."},
     )
     assert r3.status_code == 429
+
+
+def test_student_assistant_uses_llm_when_key_configured(client, monkeypatch):
+    from app import config
+
+    monkeypatch.setattr(config.settings, "assistant_openai_api_key", "sk-test-key")
+    monkeypatch.setattr(config.settings, "assistant_llm_enabled", True)
+    monkeypatch.setattr(config.settings, "assistant_openai_base_url", "https://api.openai.com/v1")
+    monkeypatch.setattr(config.settings, "assistant_daily_limit_per_user", 10)
+
+    db = get_session_factory()()
+    db.add(
+        User(
+            email="stu@test.local",
+            full_name="Aluno",
+            hashed_password=hash_password("studentpass12"),
+            role=UserRole.student,
+        )
+    )
+    db.add(
+        CourseModule(
+            slug="m1",
+            title="Modulo 1",
+            ciphertext=encrypt_content("Conteudo do modulo para o LLM."),
+        )
+    )
+    db.commit()
+    db.close()
+
+    class FakeResp:
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict:
+            return {"choices": [{"message": {"content": "Resposta sintetica do LLM."}}]}
+
+    with patch("app.assistant_service.httpx.Client") as mc:
+        mock_client = MagicMock()
+        mock_client.post.return_value = FakeResp()
+        mc.return_value.__enter__.return_value = mock_client
+
+        st = _student_token(client)
+        r = client.post(
+            "/student/assistant/ask",
+            headers={"Authorization": f"Bearer {st}"},
+            json={"module_slug": "m1", "question": "Resuma o modulo em tres linhas."},
+        )
+        assert r.status_code == 200
+        assert r.json()["answer"] == "Resposta sintetica do LLM."
+        mock_client.post.assert_called_once()
 
 
 def test_student_cannot_list_audit_log(client):

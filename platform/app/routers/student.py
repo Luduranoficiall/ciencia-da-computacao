@@ -17,7 +17,7 @@ from app.schemas import (
     ModuleListOut,
     ProgressOut,
 )
-from app.assistant_service import build_local_assistant_answer, consume_daily_quota
+from app.assistant_service import build_assistant_answer, consume_daily_quota
 from app.services import (
     get_module_plain,
     issue_certificate_if_needed,
@@ -186,7 +186,7 @@ def ask_assistant(
     except ValueError as e:
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, str(e)) from e
     try:
-        answer = build_local_assistant_answer(db, body.module_slug, body.question)
+        answer = build_assistant_answer(db, body.module_slug, body.question)
     except KeyError as e:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Modulo inexistente") from e
     return AssistantAskOut(

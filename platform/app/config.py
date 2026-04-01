@@ -66,6 +66,12 @@ class Settings(BaseSettings):
     password_require_symbol: bool = True
     # Personal Prof (assistente de estudo)
     assistant_daily_limit_per_user: int = 30
+    # LLM opcional (API OpenAI-compatible: OpenAI, Azure OpenAI, Ollama com proxy, etc.)
+    assistant_llm_enabled: bool = True
+    assistant_openai_api_key: str = ""
+    assistant_openai_base_url: str = "https://api.openai.com/v1"
+    assistant_openai_model: str = "gpt-4o-mini"
+    assistant_openai_timeout_seconds: float = 60.0
 
     @field_validator("jwt_secret")
     @classmethod
