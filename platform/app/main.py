@@ -12,6 +12,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.assistant_service import assistant_llm_configured
 from app.config import settings
+from app.error_handlers import register_exception_handlers
 from app.database import Base, get_engine, get_session_factory
 from app.db_migrate import ensure_sqlite_schema
 from app.middleware_extra import LimitRequestBodyMiddleware, RequestIdAndSecurityMiddleware
@@ -53,6 +54,7 @@ app = FastAPI(
     description="API com conteudo encriptado, progresso, certificado e visao global apenas para admin.",
     lifespan=lifespan,
 )
+register_exception_handlers(app)
 
 _cors_origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()] or ["*"]
 # Com allow_credentials=True o browser nao aceita *. Use origens explicitas para SPA noutro dominio.

@@ -34,6 +34,13 @@ class Settings(BaseSettings):
 
     # POST /student/assistant/ask: rejeitar corpos acima disto (Content-Length). 0 = sem limite extra.
     assistant_max_request_body_bytes: int = 65536
+    # Outros POST (Content-Length): limites por prefixo. 0 = sem limite nesse escalao.
+    auth_post_max_request_body_bytes: int = 65536
+    admin_post_max_request_body_bytes: int = 2097152
+    student_post_max_request_body_bytes: int = 131072
+
+    # Respostas 500: se false, nao expor mensagem de excepcao ao cliente (producao).
+    expose_internal_errors: bool = False
 
     # Caminho para data/curriculum.json (IDs obrigatorios para conclusao)
     curriculum_json_path: Path = Path(__file__).resolve().parents[2] / "data" / "curriculum.json"

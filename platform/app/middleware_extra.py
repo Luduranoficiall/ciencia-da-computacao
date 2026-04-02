@@ -141,16 +141,27 @@ class RequestIdAndSecurityMiddleware(BaseHTTPMiddleware):
         return resp
 
 
+def _max_body_bytes_for_path(method: str, path: str) -> int:
+    """Limite por Content-Length (0 = nao aplicar)."""
+    if method != "POST":
+        return 0
+    if path == "/student/assistant/ask":
+        return int(settings.assistant_max_request_body_bytes or 0)
+    if path.startswith("/auth/"):
+        return int(settings.auth_post_max_request_body_bytes or 0)
+    if path.startswith("/admin/"):
+        return int(settings.admin_post_max_request_body_bytes or 0)
+    if path.startswith("/student/"):
+        return int(settings.student_post_max_request_body_bytes or 0)
+    return 0
+
+
 class LimitRequestBodyMiddleware(BaseHTTPMiddleware):
-    """Rejeita pedidos JSON demasiado grandes antes de processar (ex.: assistente)."""
+    """Rejeita corpos POST demasiado grandes (Content-Length) antes de processar."""
 
     async def dispatch(self, request: Request, call_next):
-        max_b = int(settings.assistant_max_request_body_bytes or 0)
-        if (
-            max_b > 0
-            and request.method == "POST"
-            and request.url.path == "/student/assistant/ask"
-        ):
+        max_b = _max_body_bytes_for_path(request.method, request.url.path)
+        if max_b > 0:
             cl = request.headers.get("content-length")
             if cl:
                 try:

@@ -72,9 +72,11 @@ def list_audit_log(
 def list_students(
     admin: AdminUser,
     db: Annotated[Session, Depends(get_db)],
+    limit: int = Query(200, ge=1, le=500, description="Maximo de registos por pagina"),
+    offset: int = Query(0, ge=0, description="Deslocamento para paginacao"),
 ) -> list[StudentOverviewOut]:
     del admin
-    users = db.scalars(select(User).order_by(User.id)).all()
+    users = db.scalars(select(User).order_by(User.id).limit(limit).offset(offset)).all()
     out: list[StudentOverviewOut] = []
     for u in users:
         cert = db.scalars(select(Certificate).where(Certificate.user_id == u.id)).first()

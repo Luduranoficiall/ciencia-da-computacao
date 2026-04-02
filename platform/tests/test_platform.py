@@ -56,6 +56,74 @@ def test_admin_sees_all_students(client):
     assert emails == {"admin@test.local", "stu@test.local"}
 
 
+def test_admin_students_pagination_limit(client):
+    db = get_session_factory()()
+    db.add(
+        User(
+            email="admin@test.local",
+            full_name="Admin",
+            hashed_password=hash_password("adminpass12"),
+            role=UserRole.admin,
+        )
+    )
+    db.add(
+        User(
+            email="stu@test.local",
+            full_name="Aluno Um",
+            hashed_password=hash_password("studentpass12"),
+            role=UserRole.student,
+        )
+    )
+    db.commit()
+    db.close()
+
+    tok = _admin_token(client)
+    h = {"Authorization": f"Bearer {tok}"}
+    r = client.get("/admin/students?limit=1&offset=0", headers=h)
+    assert r.status_code == 200
+    assert len(r.json()) == 1
+
+
+def test_auth_post_rejects_oversized_body(client, monkeypatch):
+    from app import config
+
+    monkeypatch.setattr(config.settings, "auth_post_max_request_body_bytes", 80)
+    big_user = "u" * 200
+    r = client.post(
+        "/auth/token",
+        data={"username": big_user, "password": "x"},
+    )
+    assert r.status_code == 413
+
+
+def test_unhandled_exception_returns_safe_json(monkeypatch):
+    """TestClient com raise_server_exceptions=False devolve 500 JSON do handler."""
+    from app import config as cfg
+    from app.main import app
+    from starlette.testclient import TestClient
+
+    monkeypatch.setattr(cfg.settings, "expose_internal_errors", False)
+
+    async def boom():
+        raise RuntimeError("secret-never-sent")
+
+    app.add_api_route("/__crash__", boom, methods=["GET"], include_in_schema=False)
+    try:
+        c = TestClient(app, raise_server_exceptions=False)
+        r = c.get("/__crash__")
+    finally:
+        for i, route in enumerate(list(app.router.routes)):
+            if getattr(route, "path", None) == "/__crash__":
+                app.router.routes.pop(i)
+                break
+
+    assert r.status_code == 500
+    assert "secret-never-sent" not in r.text
+    data = r.json()
+    assert data["detail"] == "Erro interno do servidor."
+    assert data.get("request_id")
+
+
 def test_progress_idempotent_and_certificate_once(client):
     db = get_session_factory()()
     db.add(
