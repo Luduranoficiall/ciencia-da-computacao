@@ -66,6 +66,8 @@ class Settings(BaseSettings):
     password_require_symbol: bool = True
     # Personal Prof (assistente de estudo)
     assistant_daily_limit_per_user: int = 30
+    # Pedidos por IP por minuto (janela 60s). 0 = desligado. Complementa a quota diaria por utilizador.
+    assistant_rate_limit_per_minute_per_ip: int = 0
     # LLM opcional (API OpenAI-compatible: OpenAI, Azure OpenAI, Ollama com proxy, etc.)
     assistant_llm_enabled: bool = True
     assistant_openai_api_key: str = ""

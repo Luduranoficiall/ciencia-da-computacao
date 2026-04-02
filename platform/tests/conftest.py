@@ -5,6 +5,14 @@ from cryptography.fernet import Fernet
 from fastapi.testclient import TestClient
 
 
+@pytest.fixture(autouse=True)
+def _reset_rate_limit_buckets():
+    from app.middleware_extra import reset_rate_limit_buckets_for_tests
+
+    reset_rate_limit_buckets_for_tests()
+    yield
+
+
 @pytest.fixture
 def tmp_curriculum(tmp_path: Path) -> Path:
     p = tmp_path / "curriculum.json"

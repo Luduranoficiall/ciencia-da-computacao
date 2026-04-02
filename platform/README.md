@@ -9,7 +9,7 @@ Backend **FastAPI** com:
 - **Anti-duplicidade**: email único; par `(user_id, module_slug)` único em progresso; um certificado por `user_id` e `serial` único.
 - **Multi-dispositivo**: API stateless com JWT; qualquer cliente (web responsiva, app nativa, PWA futura) usa os mesmos endpoints. **CORS** configurável.
 - **UI do aluno (web/PWA)**: servida em `GET /ui/` (login, lista de módulos, progresso e download do certificado).
-- **Personal Prof**: `POST /student/assistant/ask` com quota diária (`ASSISTANT_DAILY_LIMIT_PER_USER`). Com `ASSISTANT_OPENAI_API_KEY` (API OpenAI-compatible) usa LLM; sem chave, resposta local a partir do módulo.
+- **Personal Prof**: `POST /student/assistant/ask` com quota diária por aluno (`ASSISTANT_DAILY_LIMIT_PER_USER`) e opcional limite por IP (`ASSISTANT_RATE_LIMIT_PER_MINUTE_PER_IP`, janela 60s). Com `ASSISTANT_OPENAI_API_KEY` (API OpenAI-compatible) usa LLM; sem chave, resposta local a partir do módulo.
 - **Verificacao publica do certificado** (sem dados pessoais): `GET /public/certificates/verify/{serial}` (serial com `A-Za-z0-9_-`); pagina em `/ui/verify.html`.
 - **Landing do curso** (sem login): textos em `data/course_presentation.json` (validado no CI com JSON Schema); `GET /public/course-presentation`; a UI em `/ui/` carrega e mostra o conteúdo antes do login.
 - **Robustez**: SQLite com **WAL** + `pool_pre_ping`; `GET /health` e `GET /health/ready` (este verifica a BD) incluem `assistant.llm_configured` sem expor segredos; cabecalho **`X-Request-ID`**; **rate limit** opcional em `POST /auth/token`; **`TrustedHostMiddleware`** opcional.

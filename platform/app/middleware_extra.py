@@ -16,8 +16,15 @@ from app.config import settings
 
 # IP -> timestamps monotonicos (ultimos 60s)
 _auth_hits: dict[str, list[float]] = defaultdict(list)
+_assistant_hits: dict[str, list[float]] = defaultdict(list)
 _AUTH_WINDOW_S = 60.0
 _log = logging.getLogger("app.request")
+
+
+def reset_rate_limit_buckets_for_tests() -> None:
+    """Limpa contadores in-memory (apenas para testes)."""
+    _auth_hits.clear()
+    _assistant_hits.clear()
 
 
 def _client_ip(request: Request) -> str:
@@ -26,10 +33,10 @@ def _client_ip(request: Request) -> str:
     return "unknown"
 
 
-def _prune_and_count(ip: str, max_per_window: int) -> bool:
-    """True se permitido, False se excedeu."""
+def _prune_and_count(bucket: dict[str, list[float]], key: str, max_per_window: int) -> bool:
+    """True se permitido, False se excedeu (janela deslizante de _AUTH_WINDOW_S)."""
     now = time.monotonic()
-    hits = _auth_hits[ip]
+    hits = bucket[key]
     while hits and (now - hits[0]) > _AUTH_WINDOW_S:
         hits.pop(0)
     if len(hits) >= max_per_window:
@@ -50,11 +57,28 @@ class RequestIdAndSecurityMiddleware(BaseHTTPMiddleware):
             and settings.rate_limit_auth_per_minute > 0
         ):
             ip = _client_ip(request)
-            if not _prune_and_count(ip, settings.rate_limit_auth_per_minute):
+            if not _prune_and_count(_auth_hits, ip, settings.rate_limit_auth_per_minute):
                 return JSONResponse(
                     status_code=429,
                     content={
                         "detail": "Muitas tentativas de login. Tente novamente em alguns minutos.",
+                    },
+                    headers={"Retry-After": "60", "X-Request-ID": rid},
+                )
+
+        if (
+            request.method == "POST"
+            and request.url.path == "/student/assistant/ask"
+            and settings.assistant_rate_limit_per_minute_per_ip > 0
+        ):
+            ip = _client_ip(request)
+            if not _prune_and_count(
+                _assistant_hits, ip, settings.assistant_rate_limit_per_minute_per_ip
+            ):
+                return JSONResponse(
+                    status_code=429,
+                    content={
+                        "detail": "Muitas perguntas ao assistente a partir deste IP. Tente novamente em breve.",
                     },
                     headers={"Retry-After": "60", "X-Request-ID": rid},
                 )

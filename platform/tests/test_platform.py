@@ -707,6 +707,58 @@ def test_student_assistant_no_quota_consumed_when_module_row_missing(client):
     assert r1.json()["usage_remaining_today"] == 9
 
 
+def test_assistant_rate_limit_per_ip_returns_429(client, monkeypatch):
+    from app import config
+
+    monkeypatch.setattr(config.settings, "assistant_rate_limit_per_minute_per_ip", 2)
+    monkeypatch.setattr(config.settings, "assistant_daily_limit_per_user", 10)
+
+    db = get_session_factory()()
+    db.add(
+        User(
+            email="stu@test.local",
+            full_name="Aluno",
+            hashed_password=hash_password("studentpass12"),
+            role=UserRole.student,
+        )
+    )
+    db.add(
+        CourseModule(
+            slug="m1",
+            title="M1",
+            ciphertext=encrypt_content("Conteudo do modulo."),
+        )
+    )
+    db.commit()
+    db.close()
+
+    st = _student_token(client)
+    h = {"Authorization": f"Bearer {st}"}
+    r1 = client.post(
+        "/student/assistant/ask",
+        headers=h,
+        json={"module_slug": "m1", "question": "Primeira pergunta com texto suficiente."},
+    )
+    assert r1.status_code == 200
+    assert r1.json()["usage_remaining_today"] == 9
+
+    r2 = client.post(
+        "/student/assistant/ask",
+        headers=h,
+        json={"module_slug": "m1", "question": "Segunda pergunta com texto suficiente."},
+    )
+    assert r2.status_code == 200
+    assert r2.json()["usage_remaining_today"] == 8
+
+    r3 = client.post(
+        "/student/assistant/ask",
+        headers=h,
+        json={"module_slug": "m1", "question": "Terceira pergunta deve ser bloqueada."},
+    )
+    assert r3.status_code == 429
+    assert "IP" in r3.json()["detail"]
+
+
 def test_student_cannot_list_audit_log(client):
     db = get_session_factory()()
     db.add(
