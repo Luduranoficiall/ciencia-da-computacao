@@ -21,6 +21,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: links-${{ github.ref }}
   cancel-in-progress: true
@@ -30,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Links relativos entre .md + URLs; exige https (sem http:// solto).
       - name: Verificar links em Markdown
@@ -53,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Extrair destinos relativos e testar existência
         run: |
