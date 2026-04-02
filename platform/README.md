@@ -69,8 +69,11 @@ API em `http://127.0.0.1:8000` com dados persistidos em `./data`.
 O ficheiro `pytest.ini` define `pythonpath` para importar o pacote `app` sem variaveis de ambiente extra.
 
 ```bash
+.venv/bin/python -m compileall -q app
 .venv/bin/pytest tests/ -v
 ```
+
+O CI (`platform-api`) corre `compileall` e `pytest` em `platform/`.
 
 ## Documentação OpenAPI
 
