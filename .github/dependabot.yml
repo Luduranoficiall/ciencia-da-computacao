@@ -22,18 +22,14 @@ updates:
         patterns:
           - "*"
 
+  # Pip da API (FastAPI). O ecossistema "docker" do Dependabot falha por vezes com
+  # Dockerfiles multi-stage / politicas do repo; atualizar a imagem base manualmente ou via PR dedicado.
   - package-ecosystem: "pip"
     directory: "/platform"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
     groups:
-      platform:
+      platform-deps:
         patterns:
           - "*"
-
-  - package-ecosystem: "docker"
-    directory: "/platform"
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 2
