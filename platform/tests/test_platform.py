@@ -1,3 +1,5 @@
+import json
+import logging
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -137,7 +139,103 @@ def test_public_verify_rejects_invalid_serial(client):
 def test_health_ready_ok(client):
     r = client.get("/health/ready")
     assert r.status_code == 200
-    assert r.json().get("database") == "ok"
+    data = r.json()
+    assert data.get("database") == "ok"
+    assert data.get("assistant", {}).get("llm_configured") is False
+
+
+def test_health_includes_assistant_llm_configured(client):
+    r = client.get("/health")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["status"] == "ok"
+    assert data["assistant"]["llm_configured"] is False
+
+
+def test_health_assistant_llm_configured_true_when_key_set(client, monkeypatch):
+    from app import config
+
+    monkeypatch.setattr(config.settings, "assistant_llm_enabled", True)
+    monkeypatch.setattr(config.settings, "assistant_openai_api_key", "sk-test")
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json()["assistant"]["llm_configured"] is True
+
+
+def test_assistant_llm_configured_matches_settings(monkeypatch):
+    from app import config
+    from app.assistant_service import assistant_llm_configured
+
+    monkeypatch.setattr(config.settings, "assistant_llm_enabled", True)
+    monkeypatch.setattr(config.settings, "assistant_openai_api_key", "")
+    assert assistant_llm_configured() is False
+    monkeypatch.setattr(config.settings, "assistant_openai_api_key", "sk-x")
+    assert assistant_llm_configured() is True
+    monkeypatch.setattr(config.settings, "assistant_llm_enabled", False)
+    assert assistant_llm_configured() is False
+
+
+def test_openapi_assistant_schemas_have_examples(client):
+    r = client.get("/openapi.json")
+    assert r.status_code == 200
+    schemas = r.json()["components"]["schemas"]
+    for name in ("AssistantAskIn", "AssistantAskOut"):
+        schema = schemas[name]
+        assert "examples" in schema and isinstance(schema["examples"], list)
+    ex_in = schemas["AssistantAskIn"]["examples"][0]
+    assert ex_in.get("module_slug") and ex_in.get("question")
+    ex_out = schemas["AssistantAskOut"]["examples"][0]
+    assert ex_out.get("module_slug")
+    assert isinstance(ex_out.get("answer"), str) and ex_out.get("answer")
+    assert isinstance(ex_out.get("usage_remaining_today"), int)
+
+
+def test_assistant_ask_structured_log_excludes_question_text(caplog, client):
+    """Regressao: nao registar o texto da pergunta (PII / dados sensiveis)."""
+    from app import config
+
+    db = get_session_factory()()
+    db.add(
+        User(
+            email="stu@test.local",
+            full_name="Aluno",
+            hashed_password=hash_password("studentpass12"),
+            role=UserRole.student,
+        )
+    )
+    db.add(
+        CourseModule(
+            slug="m1",
+            title="Modulo 1",
+            ciphertext=encrypt_content("Conteudo do modulo."),
+        )
+    )
+    db.commit()
+    db.close()
+    config.settings.assistant_daily_limit_per_user = 10
+
+    st = _student_token(client)
+    secret_phrase = "texto-da-pergunta-que-nao-deve-ir-para-logs-xyz"
+    with caplog.at_level(logging.INFO, logger="app.assistant"):
+        r = client.post(
+            "/student/assistant/ask",
+            headers={"Authorization": f"Bearer {st}"},
+            json={"module_slug": "m1", "question": secret_phrase},
+        )
+    assert r.status_code == 200
+    payloads = []
+    for rec in caplog.records:
+        if rec.name != "app.assistant":
+            continue
+        payloads.append(json.loads(rec.message))
+    assert payloads, "esperado pelo menos um log JSON do assistente"
+    for p in payloads:
+        assert "question" not in p
+        assert secret_phrase not in json.dumps(p)
+        assert p.get("event") == "assistant_ask"
+        assert p.get("mode") in ("llm", "local")
+        assert p.get("module_slug") == "m1"
+        assert "user_id" in p
 
 
 def test_cookie_auth_and_refresh(client):
@@ -540,6 +638,73 @@ def test_student_assistant_uses_llm_when_key_configured(client, monkeypatch):
         assert r.status_code == 200
         assert r.json()["answer"] == "Resposta sintetica do LLM."
         mock_client.post.assert_called_once()
+
+
+def test_student_assistant_slug_not_in_curriculum_404(client):
+    from app import config
+
+    db = get_session_factory()()
+    db.add(
+        User(
+            email="stu@test.local",
+            full_name="Aluno",
+            hashed_password=hash_password("studentpass12"),
+            role=UserRole.student,
+        )
+    )
+    db.commit()
+    db.close()
+    config.settings.assistant_daily_limit_per_user = 5
+
+    st = _student_token(client)
+    r = client.post(
+        "/student/assistant/ask",
+        headers={"Authorization": f"Bearer {st}"},
+        json={"module_slug": "zzz", "question": "Pergunta com mais de cinco caracteres."},
+    )
+    assert r.status_code == 404
+
+
+def test_student_assistant_no_quota_consumed_when_module_row_missing(client):
+    """Slug no curriculum mas sem linha em course_modules: 404 sem gastar quota."""
+    from app import config
+
+    config.settings.assistant_daily_limit_per_user = 10
+    db = get_session_factory()()
+    db.add(
+        User(
+            email="stu@test.local",
+            full_name="Aluno",
+            hashed_password=hash_password("studentpass12"),
+            role=UserRole.student,
+        )
+    )
+    db.add(
+        CourseModule(
+            slug="m1",
+            title="So M1",
+            ciphertext=encrypt_content("Conteudo."),
+        )
+    )
+    db.commit()
+    db.close()
+
+    st = _student_token(client)
+    h = {"Authorization": f"Bearer {st}"}
+    r0 = client.post(
+        "/student/assistant/ask",
+        headers=h,
+        json={"module_slug": "m2", "question": "Pergunta com texto suficiente aqui."},
+    )
+    assert r0.status_code == 404
+
+    r1 = client.post(
+        "/student/assistant/ask",
+        headers=h,
+        json={"module_slug": "m1", "question": "Primeira pergunta valida ao modulo."},
+    )
+    assert r1.status_code == 200
+    assert r1.json()["usage_remaining_today"] == 9
 
 
 def test_student_cannot_list_audit_log(client):

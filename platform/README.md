@@ -12,7 +12,7 @@ Backend **FastAPI** com:
 - **Personal Prof**: `POST /student/assistant/ask` com quota diária (`ASSISTANT_DAILY_LIMIT_PER_USER`). Com `ASSISTANT_OPENAI_API_KEY` (API OpenAI-compatible) usa LLM; sem chave, resposta local a partir do módulo.
 - **Verificacao publica do certificado** (sem dados pessoais): `GET /public/certificates/verify/{serial}` (serial com `A-Za-z0-9_-`); pagina em `/ui/verify.html`.
 - **Landing do curso** (sem login): textos em `data/course_presentation.json` (validado no CI com JSON Schema); `GET /public/course-presentation`; a UI em `/ui/` carrega e mostra o conteúdo antes do login.
-- **Robustez**: SQLite com **WAL** + `pool_pre_ping`; `GET /health/ready` verifica a BD; cabecalho **`X-Request-ID`**; **rate limit** opcional em `POST /auth/token`; **`TrustedHostMiddleware`** opcional.
+- **Robustez**: SQLite com **WAL** + `pool_pre_ping`; `GET /health` e `GET /health/ready` (este verifica a BD) incluem `assistant.llm_configured` sem expor segredos; cabecalho **`X-Request-ID`**; **rate limit** opcional em `POST /auth/token`; **`TrustedHostMiddleware`** opcional.
 - **JWT** com `iat`/`exp` em timestamp (interoperavel).
 - **Password policy + lockout**: maiuscula/minuscula/numero/simbolo configuraveis; bloqueio temporario por conta apos falhas repetidas de login.
 - **Sessao web**: apos login, cookies **HttpOnly** `access_token` e `refresh_token` (este ultimo so para `POST /auth/refresh` e `POST /auth/logout`). A UI usa `credentials: include` e **nao** guarda tokens em `localStorage`. A API continua a aceitar `Authorization: Bearer` (Swagger / scripts).
@@ -64,6 +64,8 @@ API em `http://127.0.0.1:8000` com dados persistidos em `./data`.
 - O conteúdo encriptado usa `CONTENT_ENCRYPTION_KEY`: sem esta chave **não há** recuperação do texto das aulas.
 
 ## Testes
+
+O ficheiro `pytest.ini` define `pythonpath` para importar o pacote `app` sem variaveis de ambiente extra.
 
 ```bash
 .venv/bin/pytest tests/ -v

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime, timezone
+from typing import Literal
 
 import httpx
 from sqlalchemy import select
@@ -9,6 +11,19 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.models import CourseModule, StudentAssistantUsage
 from app.security import decrypt_content
+
+
+def assistant_llm_configured() -> bool:
+    """True se o backend LLM pode ser tentado (chave nunca exposta na API)."""
+    return bool(
+        settings.assistant_llm_enabled and (settings.assistant_openai_api_key or "").strip()
+    )
+
+
+@dataclass(frozen=True)
+class AssistantResult:
+    answer: str
+    mode: Literal["llm", "local"]
 
 
 def _today_utc() -> str:
@@ -100,22 +115,19 @@ def _openai_compatible_chat(title: str, body_plain: str, question: str) -> str:
     return content.strip()
 
 
-def build_assistant_answer(db: Session, module_slug: str, question: str) -> str:
+def build_assistant_answer(db: Session, module_slug: str, question: str) -> AssistantResult:
     """Tenta LLM (OpenAI-compatible) se configurado; caso contrario ou em falha, usa modo local."""
     mod = db.scalars(select(CourseModule).where(CourseModule.slug == module_slug)).first()
     if not mod:
         raise KeyError(module_slug)
     body_plain = decrypt_content(mod.ciphertext)
-    use_llm = (
-        settings.assistant_llm_enabled
-        and (settings.assistant_openai_api_key or "").strip() != ""
-    )
+    use_llm = assistant_llm_configured()
     if use_llm:
         try:
-            return _openai_compatible_chat(mod.title, body_plain, question)
+            return AssistantResult(_openai_compatible_chat(mod.title, body_plain, question), "llm")
         except Exception:
             pass
-    return _local_from_plain(mod.title, body_plain, question)
+    return AssistantResult(_local_from_plain(mod.title, body_plain, question), "local")
 
 
 def build_local_assistant_answer(db: Session, module_slug: str, question: str) -> str:

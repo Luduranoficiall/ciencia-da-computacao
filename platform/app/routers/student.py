@@ -1,6 +1,8 @@
+import json
+import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -25,6 +27,8 @@ from app.services import (
     required_slugs,
     user_completed_set,
 )
+
+_assistant_log = logging.getLogger("app.assistant")
 
 router = APIRouter(prefix="/student", tags=["student"])
 
@@ -173,6 +177,7 @@ def download_my_certificate(
 
 @router.post("/assistant/ask", response_model=AssistantAskOut)
 def ask_assistant(
+    request: Request,
     body: AssistantAskIn,
     user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
@@ -181,16 +186,32 @@ def ask_assistant(
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Assistente disponivel apenas para alunos")
     if body.module_slug not in set(required_slugs(db)):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Modulo inexistente")
+    if not db.scalars(select(CourseModule).where(CourseModule.slug == body.module_slug)).first():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Modulo inexistente")
     try:
         remaining = consume_daily_quota(db, user.id)
     except ValueError as e:
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, str(e)) from e
     try:
-        answer = build_assistant_answer(db, body.module_slug, body.question)
+        result = build_assistant_answer(db, body.module_slug, body.question)
     except KeyError as e:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Modulo inexistente") from e
+    rid = getattr(request.state, "request_id", None)
+    _assistant_log.info(
+        json.dumps(
+            {
+                "event": "assistant_ask",
+                "request_id": rid,
+                "user_id": user.id,
+                "module_slug": body.module_slug,
+                "mode": result.mode,
+                "usage_remaining_today": remaining,
+            },
+            ensure_ascii=True,
+        )
+    )
     return AssistantAskOut(
         module_slug=body.module_slug,
-        answer=answer,
+        answer=result.answer,
         usage_remaining_today=remaining,
     )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class TokenOut(BaseModel):
@@ -107,11 +107,34 @@ class AuditLogOut(BaseModel):
 
 
 class AssistantAskIn(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "module_slug": "introducao",
+                    "question": "Quais sao os conceitos principais deste modulo?",
+                }
+            ]
+        }
+    )
+
     module_slug: str = Field(pattern=r"^[a-z][a-z0-9_]*$", max_length=64)
     question: str = Field(min_length=5, max_length=4000)
 
 
 class AssistantAskOut(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "module_slug": "introducao",
+                    "answer": "Resposta pedagogica de exemplo (LLM ou modo local).",
+                    "usage_remaining_today": 29,
+                }
+            ]
+        }
+    )
+
     module_slug: str
     answer: str
     usage_remaining_today: int

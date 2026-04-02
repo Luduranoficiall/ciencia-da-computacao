@@ -9,6 +9,7 @@ from sqlalchemy import select, text
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from app.assistant_service import assistant_llm_configured
 from app.config import settings
 from app.database import Base, get_engine, get_session_factory
 from app.db_migrate import ensure_sqlite_schema
@@ -84,14 +85,19 @@ if static_dir.is_dir():
     app.mount("/ui", StaticFiles(directory=str(static_dir), html=True), name="ui")
 
 
+def _assistant_health() -> dict:
+    return {"llm_configured": assistant_llm_configured()}
+
+
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {"status": "ok", "assistant": _assistant_health()}
 
 
 @app.get("/health/ready")
 def health_ready() -> dict:
     """Verifica ligacao a BD (para orquestradores / load balancers)."""
+    a = _assistant_health()
     try:
         db = get_session_factory()()
         try:
@@ -99,5 +105,10 @@ def health_ready() -> dict:
         finally:
             db.close()
     except Exception as e:
-        return {"status": "not_ready", "database": "error", "detail": str(e)}
-    return {"status": "ok", "database": "ok"}
+        return {
+            "status": "not_ready",
+            "database": "error",
+            "detail": str(e),
+            "assistant": a,
+        }
+    return {"status": "ok", "database": "ok", "assistant": a}
