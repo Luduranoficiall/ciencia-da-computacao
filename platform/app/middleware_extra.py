@@ -28,6 +28,12 @@ def reset_rate_limit_buckets_for_tests() -> None:
 
 
 def _client_ip(request: Request) -> str:
+    if settings.trusted_forwarded_for:
+        fwd = (request.headers.get("x-forwarded-for") or "").strip()
+        if fwd:
+            first = fwd.split(",")[0].strip()
+            if first:
+                return first
     if request.client and request.client.host:
         return request.client.host
     return "unknown"
@@ -133,3 +139,26 @@ class RequestIdAndSecurityMiddleware(BaseHTTPMiddleware):
         )
 
         return resp
+
+
+class LimitRequestBodyMiddleware(BaseHTTPMiddleware):
+    """Rejeita pedidos JSON demasiado grandes antes de processar (ex.: assistente)."""
+
+    async def dispatch(self, request: Request, call_next):
+        max_b = int(settings.assistant_max_request_body_bytes or 0)
+        if (
+            max_b > 0
+            and request.method == "POST"
+            and request.url.path == "/student/assistant/ask"
+        ):
+            cl = request.headers.get("content-length")
+            if cl:
+                try:
+                    if int(cl) > max_b:
+                        return JSONResponse(
+                            status_code=413,
+                            content={"detail": "Corpo do pedido demasiado grande."},
+                        )
+                except ValueError:
+                    pass
+        return await call_next(request)

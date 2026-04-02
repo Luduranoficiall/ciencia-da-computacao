@@ -3,20 +3,58 @@ import re
 
 import bcrypt
 import jwt
+from argon2 import PasswordHasher
+from argon2.exceptions import InvalidHashError, VerifyMismatchError
 from cryptography.fernet import Fernet, InvalidToken
 
 from app.config import settings
 
+# Argon2id (OWASP): memoria elevada reduz utilidade de GPUs; custo de tempo moderado.
+_argon2 = PasswordHasher(
+    time_cost=3,
+    memory_cost=65536,
+    parallelism=2,
+    hash_len=32,
+    salt_len=16,
+)
+
+# JWT: tolerancia a pequenas diferencas de relogio entre servidores
+_JWT_LEEWAY_S = 10
+
 
 def verify_password(plain: str, hashed: str) -> bool:
+    h = (hashed or "").strip()
+    if not h:
+        return False
+    if h.startswith("$argon2"):
+        try:
+            _argon2.verify(h, plain)
+            return True
+        except (VerifyMismatchError, InvalidHashError):
+            return False
+    # Legado bcrypt ($2a$, $2b$, $2y$)
     try:
-        return bcrypt.checkpw(plain[:72].encode("utf-8"), hashed.encode("utf-8"))
+        return bcrypt.checkpw(plain[:72].encode("utf-8"), h.encode("utf-8"))
     except ValueError:
         return False
 
 
 def hash_password(plain: str) -> str:
-    return bcrypt.hashpw(plain[:72].encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    return _argon2.hash(plain)
+
+
+def maybe_rehash_password_after_verify(plain: str, stored_hash: str) -> str | None:
+    """Apos verify_password True: migrar bcrypt -> Argon2 ou atualizar parametros Argon2."""
+    h = (stored_hash or "").strip()
+    if h.startswith("$2"):
+        return hash_password(plain)
+    if h.startswith("$argon2"):
+        try:
+            if _argon2.check_needs_rehash(h):
+                return hash_password(plain)
+        except InvalidHashError:
+            return hash_password(plain)
+    return None
 
 
 def validate_password_strength(plain: str) -> None:
@@ -45,7 +83,16 @@ def create_access_token(sub: str, role: str, user_id: int, token_version: int) -
 
 
 def decode_token(token: str) -> dict:
-    return jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+    return jwt.decode(
+        token,
+        settings.jwt_secret,
+        algorithms=[settings.jwt_algorithm],
+        leeway=_JWT_LEEWAY_S,
+        options={
+            "require": ["exp", "iat", "sub"],
+            "verify_signature": True,
+        },
+    )
 
 
 def get_fernet() -> Fernet:

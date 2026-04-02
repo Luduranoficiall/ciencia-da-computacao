@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from cryptography.fernet import Fernet
 from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -26,6 +27,13 @@ class Settings(BaseSettings):
 
     # Fernet (32 bytes url-safe base64). Gerar: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     content_encryption_key: str = ""
+
+    # Atras de reverse proxy confiavel: usar primeiro IP de X-Forwarded-For para rate limits / logs.
+    # NUNCA ativar sem proxy que sobrescreva o cabecalho (spoofing).
+    trusted_forwarded_for: bool = False
+
+    # POST /student/assistant/ask: rejeitar corpos acima disto (Content-Length). 0 = sem limite extra.
+    assistant_max_request_body_bytes: int = 65536
 
     # Caminho para data/curriculum.json (IDs obrigatorios para conclusao)
     curriculum_json_path: Path = Path(__file__).resolve().parents[2] / "data" / "curriculum.json"
@@ -74,6 +82,20 @@ class Settings(BaseSettings):
     assistant_openai_base_url: str = "https://api.openai.com/v1"
     assistant_openai_model: str = "gpt-4o-mini"
     assistant_openai_timeout_seconds: float = 60.0
+
+    @field_validator("content_encryption_key")
+    @classmethod
+    def validate_fernet_key_format(cls, v: str) -> str:
+        v = (v or "").strip()
+        if not v:
+            return ""
+        try:
+            Fernet(v.encode())
+        except Exception as e:
+            raise ValueError(
+                "CONTENT_ENCRYPTION_KEY invalida: use Fernet.generate_key() (32 bytes url-safe base64)."
+            ) from e
+        return v
 
     @field_validator("jwt_secret")
     @classmethod

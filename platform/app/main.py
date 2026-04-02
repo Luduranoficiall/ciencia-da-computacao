@@ -4,6 +4,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select, text
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
@@ -13,7 +14,7 @@ from app.assistant_service import assistant_llm_configured
 from app.config import settings
 from app.database import Base, get_engine, get_session_factory
 from app.db_migrate import ensure_sqlite_schema
-from app.middleware_extra import RequestIdAndSecurityMiddleware
+from app.middleware_extra import LimitRequestBodyMiddleware, RequestIdAndSecurityMiddleware
 from app.models import User, UserRole
 from app.routers import admin, auth, public, student
 from app.security import hash_password
@@ -71,8 +72,9 @@ _hosts = [h.strip() for h in settings.trusted_hosts.split(",") if h.strip()]
 if _hosts:
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=_hosts)
 
-# Rate limit + request id + headers (ultimo adicionado = primeiro a processar o pedido)
+# Rate limit + request id + headers; depois limite de corpo (ultimo = executa primeiro no pedido)
 app.add_middleware(RequestIdAndSecurityMiddleware)
+app.add_middleware(LimitRequestBodyMiddleware)
 
 app.include_router(auth.router)
 app.include_router(admin.router)
@@ -83,6 +85,21 @@ app.include_router(public.router)
 static_dir = Path(__file__).resolve().parents[1] / "static"
 if static_dir.is_dir():
     app.mount("/ui", StaticFiles(directory=str(static_dir), html=True), name="ui")
+
+# RFC 9116 — substituir Contact antes de producao
+_SECURITY_TXT = """# Editar Contact antes de deploy publico.
+Contact: mailto:security@example.com
+Preferred-Languages: pt, en
+"""
+
+
+@app.get("/.well-known/security.txt", include_in_schema=False)
+def security_txt() -> Response:
+    return Response(
+        content=_SECURITY_TXT.encode("utf-8"),
+        media_type="text/plain; charset=utf-8",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 
 
 def _assistant_health() -> dict:

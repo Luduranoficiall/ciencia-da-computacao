@@ -55,6 +55,7 @@ API em `http://127.0.0.1:8000` com dados persistidos em `./data`.
 
 ## Produção (mínimo)
 
+- **SECURITY.md** — checklist de seguranca (Argon2id, Fernet, TLS, proxy, `/.well-known/security.txt`) e limites do modelo de confianca.
 - **HTTPS obrigatório** (TLS termina no reverse proxy ou no servidor); cifrado no disco protege cópias da BD, não o tráfego.
 - `JWT_SECRET` forte; `CORS_ORIGINS` restrito; firewall só para ti no painel admin se expuseres a mesma API.
 - Hardening (opcional, via `.env`): `REQUIRE_HTTPS=true` ativa redirecionamento para HTTPS + HSTS e adiciona headers de segurança (CSP) na UI.

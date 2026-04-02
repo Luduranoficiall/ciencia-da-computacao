@@ -162,6 +162,55 @@ def test_health_assistant_llm_configured_true_when_key_set(client, monkeypatch):
     assert r.json()["assistant"]["llm_configured"] is True
 
 
+def test_security_txt_endpoint(client):
+    r = client.get("/.well-known/security.txt")
+    assert r.status_code == 200
+    assert "text/plain" in r.headers.get("content-type", "")
+    assert b"Contact:" in r.content
+
+
+def test_login_upgrades_bcrypt_hash_to_argon2(client):
+    import bcrypt
+    from sqlalchemy import select
+
+    db = get_session_factory()()
+    legacy = bcrypt.hashpw(b"studentpass12", bcrypt.gensalt()).decode()
+    db.add(
+        User(
+            email="legacy@test.local",
+            full_name="Legado",
+            hashed_password=legacy,
+            role=UserRole.student,
+        )
+    )
+    db.commit()
+    db.close()
+
+    r = client.post(
+        "/auth/token",
+        data={"username": "legacy@test.local", "password": "studentpass12"},
+    )
+    assert r.status_code == 200, r.text
+    db = get_session_factory()()
+    u = db.scalars(select(User).where(User.email == "legacy@test.local")).first()
+    assert u is not None
+    assert u.hashed_password.startswith("$argon2")
+    db.close()
+
+
+def test_assistant_post_rejects_oversized_body(client, monkeypatch):
+    from app import config
+
+    monkeypatch.setattr(config.settings, "assistant_max_request_body_bytes", 80)
+    body = b'{"module_slug":"m1","question":"' + b"x" * 200 + b'"}'
+    r = client.post(
+        "/student/assistant/ask",
+        content=body,
+        headers={"Content-Type": "application/json", "Content-Length": str(len(body))},
+    )
+    assert r.status_code == 413
+
+
 def test_assistant_llm_configured_matches_settings(monkeypatch):
     from app import config
     from app.assistant_service import assistant_llm_configured

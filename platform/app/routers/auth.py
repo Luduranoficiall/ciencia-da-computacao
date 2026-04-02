@@ -13,7 +13,13 @@ from app.database import get_db
 from app.models import User, UserRole
 from app.refresh_token_service import create_refresh_token_row, revoke_refresh_token, rotate_refresh_token
 from app.schemas import OkOut, RefreshIn, RegisterIn, TokenOut
-from app.security import create_access_token, hash_password, validate_password_strength, verify_password
+from app.security import (
+    create_access_token,
+    hash_password,
+    maybe_rehash_password_after_verify,
+    validate_password_strength,
+    verify_password,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -59,6 +65,9 @@ def login(
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Conta desativada")
     user.failed_login_attempts = 0
     user.locked_until = None
+    new_hash = maybe_rehash_password_after_verify(form.password, user.hashed_password)
+    if new_hash:
+        user.hashed_password = new_hash
     access = create_access_token(
         sub=user.email,
         role=user.role.value,
