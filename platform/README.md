@@ -16,7 +16,7 @@ Backend **FastAPI** com:
 - **JWT** com `iat`/`exp` em timestamp (interoperavel).
 - **Password policy + lockout**: maiuscula/minuscula/numero/simbolo configuraveis; bloqueio temporario por conta apos falhas repetidas de login.
 - **Sessao web**: apos login, cookies **HttpOnly** `access_token` e `refresh_token` (este ultimo so para `POST /auth/refresh` e `POST /auth/logout`). A UI usa `credentials: include` e **nao** guarda tokens em `localStorage`. A API continua a aceitar `Authorization: Bearer` (Swagger / scripts).
-- **Controlo admin**: `GET /admin/students` inclui `active_sessions` (refresh tokens ainda validos). `POST /admin/students/{id}/revoke-sessions` revoga **todos** os refresh tokens e **invalida imediatamente** os JWTs de access desse utilizador (claim `tv` / `access_token_version` na BD). Migracao SQLite automatica em arranque se faltar a coluna `users.access_token_version`.
+- **Controlo admin**: `GET /admin/students` lista paginada (`limit`/`offset`) e inclui `active_sessions` (refresh tokens ainda validos). `POST /admin/students/{id}/revoke-sessions` revoga **todos** os refresh tokens e **invalida imediatamente** os JWTs de access desse utilizador (claim `tv` / `access_token_version` na BD). Migracao SQLite automatica em arranque se faltar a coluna `users.access_token_version`.
 - **Auditoria**: acoes administrativas sao um conjunto **fechado** (`AuditAction` em `app/audit_service.py`); `record_audit_log` so aceita esses valores; `GET /admin/audit-log?action=...` usa o mesmo enum e devolve **422** se o valor nao for valido (OpenAPI lista os valores).
 
 ## Arranque local
