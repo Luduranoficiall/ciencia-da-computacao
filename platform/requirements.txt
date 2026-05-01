@@ -1,13 +1,13 @@
 # Plataforma LMS (certificados, BD, conteudo encriptado). Python 3.11+
-fastapi>=0.115.0,<1
-uvicorn[standard]>=0.32.0,<1
-sqlalchemy>=2.0.36,<3
-python-multipart>=0.0.12,<1
-pyjwt[crypto]>=2.9.0,<3
-argon2-cffi>=23.1.0,<26
-bcrypt>=4.2.0,<5
-cryptography>=43.0.0,<46
-fpdf2>=2.8.0,<3
-pydantic-settings>=2.6.0,<3
-email-validator>=2.2.0,<3
-httpx>=0.27.0,<1
+fastapi>=0.136.1,<1
+uvicorn[standard]>=0.46.0,<1
+sqlalchemy>=2.0.49,<3
+python-multipart>=0.0.27,<1
+pyjwt[crypto]>=2.12.1,<3
+argon2-cffi>=25.1.0,<26
+bcrypt>=5.0.0,<6
+cryptography>=47.0.0,<48
+fpdf2>=2.8.7,<3
+pydantic-settings>=2.14.0,<3
+email-validator>=2.3.0,<3
+httpx>=0.28.1,<1
